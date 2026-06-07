@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Change Mgmt">
+<meta name="theme-color" content="#07090f">
+<title>Change Management</title>
+
+<!-- PWA MANIFEST (inline as data URI) -->
+<link rel="manifest" href="data:application/json,{
+  %22name%22:%22Change%20Management%20Study%22,
+  %22short_name%22:%22Change%20Mgmt%22,
+  %22description%22:%22Change%20management%20revision%20app%22,
+  %22start_url%22:%22.%22,
+  %22display%22:%22standalone%22,
+  %22background_color%22:%22%2307090f%22,
+  %22theme_color%22:%22%2310b981%22,
+  %22orientation%22:%22portrait%22,
+  %22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20512%20512%27%3E%3Crect%20width%3D%27512%27%20height%3D%27512%27%20rx%3D%27115%27%20fill%3D%27%2307090f%27%2F%3E%3Ctext%20x%3D%27256%27%20y%3D%27330%27%20text-anchor%3D%27middle%27%20font-size%3D%27280%27%20fill%3D%27%2310b981%27%3E%E2%9A%A1%3C%2Ftext%3E%3C%2Fsvg%3E%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%20maskable%22}]
+}">
+
+<!-- APPLE TOUCH ICON (inline SVG as data URI) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%2307090f'/><text x='256' y='330' text-anchor='middle' font-size='280' fill='%2310b981'>&#x26A1;</text></svg>">
+
+<style>
+:root{
+  --em:#10b981;--em2:#34d399;--em3:#6ee7b7;
+  --pu:#8b5cf6;--pu2:#a78bfa;--pu3:#c4b5fd;
+  --am:#f59e0b;--rd:#ef4444;--bl:#3b82f6;
+  --bg:#07090f;--sf:#0f1420;--cd:#141926;
+  --bdr:rgba(255,255,255,0.07);--bdh:rgba(255,255,255,0.14);
+  --tx:#eef2ff;--mu:#8892a4;--fa:#3d4a5c;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+html{height:100%;overscroll-behavior:none}
+body{background:var(--bg);color:var(--tx);font-family:"DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+input,textarea,button{font-family:inherit;-webkit-appearance:none;appearance:none}
+input:focus,textarea:focus{outline:none;border-color:var(--em)!important}
+button:active{opacity:0.8;transform:scale(0.98)}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--fa);border-radius:3px}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{0%{transform:scale(0.88);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}50%{box-shadow:0 0 18px 5px rgba(16,185,129,0.2)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes confetti{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(200px) rotate(720deg);opacity:0}}
+@keyframes timerPulse{0%,100%{color:var(--rd)}50%{color:#ff6b6b}}
+
+.fadeUp{animation:fadeUp 0.3s ease both}
+.pop{animation:pop 0.22s ease both}
+.shake{animation:shake 0.35s ease}
+
+/* LAYOUT */
+#app{min-height:100vh;position:relative}
+.page{padding:72px 16px 88px;max-width:680px;margin:0 auto}
+
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(7,9,15,0.97);border-bottom:1px solid var(--bdr);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.topbar-inner{padding:10px 16px 0;max-width:680px;margin:0 auto}
+
+/* BOTTOM NAV */
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(7,9,15,0.97);border-top:1px solid var(--bdr);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:flex;padding:8px 0 max(8px,env(safe-area-inset-bottom))}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;background:none;border:none;cursor:pointer;color:var(--fa);font-size:10px;font-weight:500;font-family:inherit;transition:color 0.2s}
+.nav-btn.active{color:var(--em);font-weight:700}
+.nav-btn .nav-icon{font-size:20px}
+.nav-indicator{width:20px;height:2px;border-radius:2px;background:var(--em);margin-top:1px}
+
+/* CARDS */
+.card{background:var(--cd);border:1px solid var(--bdr);border-radius:16px;padding:16px;margin-bottom:12px;transition:border-color 0.2s}
+.card-hero{border-radius:20px;padding:20px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden}
+
+/* TABS */
+.tabs{display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:10px}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:6px 13px;border-radius:20px;border:1.5px solid var(--bdr);background:transparent;color:var(--mu);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all 0.2s}
+.tab-btn.active{color:#000;border-color:transparent;font-weight:800}
+.add-tab-btn{flex-shrink:0;padding:6px 13px;border-radius:20px;border:1.5px solid rgba(16,185,129,0.4);background:rgba(16,185,129,0.08);color:var(--em2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+
+/* STEP ITEMS */
+.step-item{background:var(--cd);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;cursor:pointer;margin-bottom:7px;transition:border-color 0.2s,background 0.2s}
+.step-item.open{background:rgba(16,185,129,0.05);border-color:rgba(16,185,129,0.3)}
+.step-hdr{display:flex;align-items:center;gap:12px;padding:13px 15px}
+.step-letter{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;background:rgba(16,185,129,0.15);color:var(--em2);border:1.5px solid rgba(16,185,129,0.3);transition:all 0.2s}
+.step-item.open .step-letter{background:var(--em);color:#000;border-color:var(--em)}
+.step-word{font-weight:700;font-size:14px}
+.step-prev{color:var(--mu);font-size:12px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
+.step-chev{margin-left:auto;color:var(--fa);font-size:12px;transition:transform 0.25s}
+.step-item.open .step-chev{transform:rotate(180deg);color:var(--em2)}
+.step-body{display:none;padding:0 15px 15px;animation:fadeUp 0.2s ease both}
+.step-item.open .step-body{display:block}
+
+/* BUTTONS */
+.btn{padding:12px 20px;border-radius:12px;border:none;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit;transition:all 0.18s}
+.btn-primary{background:linear-gradient(135deg,var(--em),var(--pu));color:#fff;animation:pulse 3s ease infinite}
+.btn-em{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:var(--em2)}
+.btn-ghost{background:rgba(255,255,255,0.06);border:1px solid var(--bdr);color:var(--mu)}
+.btn-full{width:100%;padding:14px;font-size:15px}
+.btn:disabled{opacity:0.35;pointer-events:none}
+
+/* INPUTS */
+.inp{width:100%;background:rgba(255,255,255,0.05);border:1.5px solid var(--bdr);border-radius:12px;color:var(--tx);font-size:14px;padding:12px 14px;font-family:inherit;transition:border-color 0.2s}
+.inp-lg{min-height:130px;resize:vertical;line-height:1.6}
+
+/* QUIZ OPTIONS */
+.q-opt{display:flex;align-items:center;gap:11px;padding:13px 15px;background:rgba(255,255,255,0.03);border:1.5px solid var(--bdr);border-radius:13px;cursor:pointer;margin-bottom:7px;width:100%;text-align:left;font-family:inherit;color:var(--tx);transition:border-color 0.15s,background 0.15s}
+.q-opt.correct{background:rgba(16,185,129,0.1);border-color:var(--em)}
+.q-opt.wrong{background:rgba(239,68,68,0.08);border-color:var(--rd)}
+.q-opt.dim{opacity:0.3;pointer-events:none}
+.q-badge{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:var(--mu);flex-shrink:0;transition:all 0.18s}
+.q-opt.correct .q-badge{background:var(--em);color:#000}
+.q-opt.wrong .q-badge{background:var(--rd);color:#fff}
+
+/* FEEDBACK BOX */
+.fb-box{margin-top:10px;padding:13px 15px;border-radius:13px}
+.fb-good{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25)}
+.fb-bad{background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2)}
+.study-note{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 13px;margin-top:8px}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.95);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.modal-overlay.show{display:block}
+.modal-inner{max-width:640px;margin:0 auto;padding:20px 16px 60px}
+
+/* QUICK-FIRE ANSWER BOX */
+.qf-input{width:100%;background:rgba(255,255,255,0.05);border:1.5px solid var(--bdr);border-radius:12px;color:var(--tx);font-size:16px;padding:14px 16px;font-family:inherit;transition:border-color 0.2s,background 0.2s}
+.qf-input.correct{border-color:var(--em);background:rgba(16,185,129,0.08)}
+.qf-input.wrong{border-color:var(--rd);background:rgba(239,68,68,0.07)}
+
+/* DOTS PROGRESS */
+.dots{display:flex;gap:4px;flex-wrap:wrap;margin-top:16px}
+.dot{width:8px;height:8px;border-radius:50%}
+
+/* TUTOR CHAT */
+.chat-wrap{flex:1;overflow-y:auto;padding:76px 16px 160px;max-width:680px;margin:0 auto;width:100%}
+.chat-msg{display:flex;margin-bottom:14px}
+.chat-msg.user{justify-content:flex-end}
+.bubble{max-width:82%;padding:12px 15px;font-size:14px;line-height:1.65}
+.bubble.ai{background:var(--cd);border:1px solid var(--bdr);border-radius:18px 18px 18px 4px}
+.bubble.user{background:linear-gradient(135deg,var(--em),var(--pu));border-radius:18px 18px 4px 18px}
+.ai-avatar{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--em),var(--pu));display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-right:8px;margin-top:2px;font-size:15px}
+.typing-dot{width:7px;height:7px;border-radius:50%;background:var(--em);animation:bounce 1.2s ease infinite}
+
+/* INSTALL BANNER */
+.install-banner{display:none;position:fixed;bottom:70px;left:16px;right:16px;z-index:150;background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(139,92,246,0.15));border:1px solid rgba(16,185,129,0.35);border-radius:16px;padding:14px 16px;backdrop-filter:blur(8px)}
+
+/* COLOR PICKER */
+.color-dot{width:32px;height:32px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all 0.2s}
+.color-dot.picked{border-color:#fff;transform:scale(1.2)}
+
+/* SCORE RING */
+.score-ring-wrap{position:relative;width:148px;height:148px;margin:0 auto 18px}
+.score-ring-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+
+/* TAGS */
+.tag{display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:1.5px;border:1px solid}
+.theory-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:20px;padding:4px 12px;margin-bottom:12px}
+
+/* SELF-RATE BUTTONS */
+.sr-btn{flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--bdr);background:transparent;color:var(--mu);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.sr-btn.gs{background:rgba(16,185,129,0.15);border-color:var(--em);color:var(--em2)}
+.sr-btn.os{background:rgba(245,158,11,0.15);border-color:var(--am);color:var(--am)}
+.sr-btn.bs{background:rgba(239,68,68,0.1);border-color:var(--rd);color:#f87171}
+
+/* CONFETTI */
+.cfp{position:fixed;border-radius:2px;animation:confetti 1.6s ease forwards;pointer-events:none;z-index:500}
+
+/* PROGRESS BAR */
+.prog-bar{height:5px;background:var(--bdr);border-radius:3px;margin-bottom:20px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--em),var(--pu));border-radius:3px;transition:width 0.5s ease}
+
+/* TIMER */
+.timer-ring{font-size:22px;font-weight:900;min-width:40px;text-align:center;transition:color 0.3s}
+.timer-low{animation:timerPulse 0.5s ease infinite}
+</style>
+
+<!-- Google Font loaded async for PWA -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="app">
+  <div id="loader" style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:16px">
+    <div style="width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,0.07);border-top-color:var(--em);animation:spin 0.8s linear infinite"></div>
+    <div style="color:var(--mu);font-size:13px">Loading...</div>
+  </div>
+</div>
+
+<!-- INSTALL BANNER -->
+<div class="install-banner" id="installBanner">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="font-weight:700;font-size:13px;margin-bottom:2px">⚡ Install as App</div>
+      <div style="font-size:12px;color:var(--mu)">Add to home screen for offline access</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" style="padding:8px 14px;font-size:13px;animation:none" id="installBtn">Install</button>
+      <button class="btn btn-ghost" style="padding:8px 12px;font-size:13px" onclick="document.getElementById('installBanner').style.display='none'">✕</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD TOPIC MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal-inner">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-size:18px;font-weight:900;background:linear-gradient(90deg,var(--em2),var(--pu2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">＋ Add New Topic</div>
+      <button class="btn btn-ghost" style="padding:7px 13px;font-size:13px" onclick="closeAddModal()">✕ Close</button>
+    </div>
+    <div id="addForm">
+      <div style="margin-bottom:18px">
+        <label style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:6px">Theory Name</label>
+        <div style="font-size:11px;color:var(--fa);margin-bottom:8px">e.g. Porter's Five Forces, McKinsey 7S, Nudge Theory</div>
+        <input class="inp" id="at-name" type="text" placeholder="Theory name...">
+      </div>
+      <div style="margin-bottom:18px">
+        <label style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:6px">Subtitle</label>
+        <input class="inp" id="at-sub" type="text" placeholder="e.g. Competitive industry analysis...">
+      </div>
+      <div style="margin-bottom:18px">
+        <label style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:6px">Your Notes</label>
+        <div style="font-size:11px;color:var(--fa);margin-bottom:8px">Paste lecture notes or textbook paragraphs. More detail = better output.</div>
+        <textarea class="inp inp-lg" id="at-notes" placeholder="Paste your notes here..." rows="7"></textarea>
+      </div>
+      <div style="margin-bottom:18px">
+        <label style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:6px">Module Tag</label>
+        <input class="inp" id="at-tag" type="text" placeholder="e.g. Week 6, Unit 3, Strategy...">
+      </div>
+      <div style="margin-bottom:20px">
+        <label style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1.5px;display:block;margin-bottom:10px">Tab Colour</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="colorPicker">
+          <button class="color-dot picked" style="background:#10b981" data-color="#10b981"></button>
+          <button class="color-dot" style="background:#8b5cf6" data-color="#8b5cf6"></button>
+          <button class="color-dot" style="background:#f59e0b" data-color="#f59e0b"></button>
+          <button class="color-dot" style="background:#ef4444" data-color="#ef4444"></button>
+          <button class="color-dot" style="background:#3b82f6" data-color="#3b82f6"></button>
+          <button class="color-dot" style="background:#ec4899" data-color="#ec4899"></button>
+          <button class="color-dot" style="background:#14b8a6" data-color="#14b8a6"></button>
+          <button class="color-dot" style="background:#a78bfa" data-color="#a78bfa"></button>
+        </div>
+      </div>
+      <div id="at-err" style="display:none;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:11px 14px;color:#f87171;font-size:13px;margin-bottom:14px"></div>
+      <button class="btn btn-primary btn-full" id="at-gen-btn" onclick="generateTopic()">✨ Generate with AI</button>
+      <div style="font-size:11px;color:var(--fa);text-align:center;margin-top:10px;line-height:1.6">Generates: overview · key concepts · 6 MC questions · essay question with model answer · quick-fire items · saved permanently</div>
+    </div>
+    <div id="addProgress" style="display:none;text-align:center;padding:40px 0">
+      <div style="width:48px;height:48px;border-radius:50%;border:4px solid rgba(255,255,255,0.08);border-top-color:var(--em);animation:spin 0.8s linear infinite;margin:0 auto 16px"></div>
+      <div style="font-size:14px;color:var(--mu);margin-bottom:8px">Claude is generating your topic...</div>
+      <div id="addStep" class="fadeUp" style="font-size:12px;color:var(--fa)">Reading your notes</div>
+    </div>
+    <div id="addDone" style="display:none"></div>
+  </div>
+</div>
+
+<script>
+// ── BUILT-IN THEORY DATA ─────────────────────────────────────────────────────
+var THEORIES_BUILTIN = [
+{id:"adkar",ti:"ADKAR",co:"#10b981",ft:"Prosci ADKAR Model",su:"People-centred individual change",tg:"Individual",mn:"All Desired Knowledge Achieves Results",ov:"ADKAR is Prosci's goal-oriented model focusing on the individual before the organisation. Change only succeeds when every person moves through all 5 milestones in sequence. Miss one and the change stalls.",ki:"The weakest ADKAR element is the root cause of resistance. Diagnose first, then fix.",cn:"ADKAR maps onto Lewin: Unfreeze=A+D, Change=K+A, Refreeze=R. Complements Kotter by showing what must happen at the individual level while Kotter guides the organisational level.",
+st:[{l:"A",w:"Awareness",d:"Why must we change? People need to understand the reason for change before they can support it.",t:"Communicate the burning platform — what happens if we do NOT change?"},{l:"D",w:"Desire",d:"Do I WANT to change? Awareness alone is not enough — people must choose to participate.",t:"Address WIIFM (What's In It For Me?). Managers are the most influential lever here."},{l:"K",w:"Knowledge",d:"How do I change? Training, coaching, and clear instructions on what to do differently.",t:"Do not train too early! Knowledge before Desire = wasted effort and resentment."},{l:"A",w:"Ability",d:"Can I actually do it? Converting knowledge into real, consistent on-the-job practice.",t:"Ability takes longer than knowledge. Coaching, practice time, and feedback loops are essential."},{l:"R",w:"Reinforcement",d:"Will the change stick? Recognition, rewards, and accountability mechanisms to prevent regression.",t:"The most overlooked step. Without reinforcement, people revert to old habits within weeks."}],
+qz:[{q:"Which ADKAR element is most commonly overlooked, causing people to revert to old habits?",o:["Reinforcement","Awareness","Knowledge","Desire"],a:0,im:"Think about what happens AFTER training ends. Most programmes focus on the first 4 steps and neglect what sustains change."},{q:"A team understands the change but refuses to engage. Which ADKAR element is missing?",o:["Desire","Awareness","Knowledge","Ability"],a:0,im:"Understanding does not equal wanting. Awareness and Desire are two distinct steps."},{q:"Prosci Unified Value Proposition requires success on which two sides?",o:["Technical and people","Strategic and tactical","Leadership and culture","Process and technology"],a:0,im:"Technical = Design, Develop, Deliver. People = Engage, Adopt, Use. Both must succeed for ROI."},{q:"Which ADKAR element should come BEFORE training programmes?",o:["Desire","Ability","Reinforcement","Knowledge"],a:0,im:"Sequence matters. Desire must precede Knowledge training. Training unwilling people is wasted resource."},{q:"In the PCT model what sits at the apex?",o:["Leadership and Sponsorship","Project Management","Change Management","ADKAR"],a:0,im:"Without active visible sponsorship neither project management nor change management can succeed."},{q:"Ability in ADKAR differs from Knowledge because:",o:["Knowledge is understanding while Ability is actual performance","They are the same thing","Ability comes before Knowledge","Knowledge is about doing"],a:0,im:"You can know HOW to do something but still struggle to do it consistently. Practice bridges this gap."}],
+wq:[{q:"Using the ADKAR model explain why a large IT system implementation in an NHS Trust failed to achieve adoption despite being delivered on time and on budget.",pr:"Consider each ADKAR element. Which elements were likely missing? What should the change team have done differently? 200-300 words.",mo:"Successful delivery reflects success on the technical side of Prosci's UVP (Design, Develop, Deliver) but adoption failure reveals breakdown on the people side. Awareness may have been communicated but not made compelling for frontline staff. Desire is the most likely critical failure — NHS staff facing heavy workloads had no personal motivation (WIIFM). Knowledge/training may have been delivered too early (before Desire) making it ineffective. Ability requires post-go-live coaching often cut from budgets. Reinforcement — measurement and recognition of adoption — is almost always missing. Recommendations: engage clinical champions early to build Desire, deploy ADKAR diagnostic assessments, provide manager coaching to address resistance, build reinforcement mechanisms including adoption metrics into post-go-live governance.",im:["Define each ADKAR element explicitly before applying it","Use the UVP framework to frame the technical vs people split","Reference specific evidence of each missing element","Conclude with prioritised recommendations linked to ADKAR gaps","Consider the role of senior clinical leadership sponsorship"]}],
+qf:[{type:"acronym",prompt:"What does A stand for in ADKAR?",answer:"Awareness",hint:"The first step — understanding WHY change is happening"},{type:"acronym",prompt:"What does D stand for in ADKAR?",answer:"Desire",hint:"WIIFM — wanting to participate and support the change"},{type:"acronym",prompt:"What does K stand for in ADKAR?",answer:"Knowledge",hint:"HOW to change — training and coaching"},{type:"acronym",prompt:"What does the second A stand for in ADKAR?",answer:"Ability",hint:"Actually doing it consistently in practice"},{type:"acronym",prompt:"What does R stand for in ADKAR?",answer:"Reinforcement",hint:"Making the change stick — the most overlooked step"},{type:"match",prompt:"Match: Desire in ADKAR",answer:"To participate and support the change",hint:"WIIFM — What's In It For Me?"},{type:"match",prompt:"Match: Ability in ADKAR",answer:"To implement required skills and behaviours",hint:"Converting knowledge into consistent practice"},{type:"fill",prompt:"Without ___, people revert to old habits within weeks.",answer:"Reinforcement",hint:"The last and most neglected ADKAR step"},{type:"fill",prompt:"Do not train too early — ___ before Desire equals wasted effort.",answer:"Knowledge",hint:"The sequence matters in ADKAR"}]},
+
+{id:"lewin",ti:"Lewin",co:"#8b5cf6",ft:"Lewin's 3-Stage Framework",su:"Unfreeze, Change, Refreeze",tg:"Foundational",mn:"An ice cube: melt it, reshape it, freeze it again",ov:"Kurt Lewin (1940s) created one of the earliest change models. It treats organisations like a block of ice — unfreeze existing behaviour, make the change, then refreeze so the new state becomes the norm.",ki:"Most change fails not during the change itself, but because leaders skip unfreezing (causing resistance) or skip refreezing (causing regression).",cn:"Lewin's three phases map directly onto ADKAR. Kotter's 8 steps overlay: Steps 1-4=Unfreeze, Steps 5-7=Change, Step 8=Refreeze. Force Field Analysis is a key diagnostic tool.",
+st:[{l:"1",w:"Unfreeze",d:"Shake people out of their comfort zone. Create urgency, question the status quo, dismantle old habits, beliefs, and structures.",t:"Use Kotter Step 1 (Urgency) here. This is the hardest phase — you are fighting inertia and identity."},{l:"2",w:"Change",d:"Implement the new ways of working. The transition period of uncertainty, experimentation, and learning.",t:"Refer to ADKAR K and A here. Support people through the messy middle with coaching and communication."},{l:"3",w:"Refreeze",d:"Cement the new normal. Make the change stick through culture, systems, policies, and recognition structures.",t:"Mirrors ADKAR Reinforcement. Embed it in performance reviews, onboarding, and leadership behaviour."}],
+qz:[{q:"Which stages of Lewin's model are most commonly skipped by leaders?",o:["Both Unfreeze and Refreeze","Only Change","Only Unfreeze","Only Refreeze"],a:0,im:"Leaders skip Unfreeze (impatience) and Refreeze (declaring victory too early and moving on)."},{q:"Lewin's Force Field Analysis helps you:",o:["Identify driving and restraining forces","Map market share against growth","Plot Ansoff strategies","Assess ADKAR gaps"],a:0,im:"Force Field Analysis diagnoses what forces support and oppose a change before implementation."},{q:"Which ADKAR elements correspond to the Unfreeze stage?",o:["Awareness and Desire","Knowledge and Ability","Ability and Reinforcement","Desire and Knowledge"],a:0,im:"Unfreeze is about creating conditions for change — Awareness (why) and Desire (want to) must come first."},{q:"Force Field Analysis suggests you should:",o:["Strengthen driving forces OR reduce restraining forces","Only add more driving forces","Only reduce restraining forces","Ignore forces and implement anyway"],a:0,im:"Both approaches tip the equilibrium. Reducing restraining forces is often more effective."},{q:"Lewin's Refreeze stage is best achieved through:",o:["Culture, systems and recognition structures","Training programmes","Urgency communications","Project management governance"],a:0,im:"Refreezing is cultural and systemic — embedding the new behaviour into how the organisation operates."}],
+wq:[{q:"Apply Lewin's Force Field Analysis to a retail company introducing self-checkout technology. Identify the driving and restraining forces and recommend how management should proceed.",pr:"Be specific about the forces. Recommend actions for both sides of the field. 200-300 words.",mo:"Driving forces: cost reduction pressure from rising staff costs, competitive pressure from rivals who have deployed self-checkout, customer demand for faster options, and strategic efficiency targets. Restraining forces: staff fear of redundancy, customer preference for human interaction particularly among older demographics, union resistance, concerns about theft and shrinkage, and technology reliability issues. Using Force Field Analysis, management should focus on reducing restraining forces rather than amplifying driving forces: guarantee alternative roles for affected staff, pilot with tech-comfortable customer segments first, invest in reliable technology to reduce frustration, and engage union representatives early. Staff redundancy fear is the highest-weight restraining force and must be addressed directly before implementation begins.",im:["Draw the force field diagram with weighting","Apply Lewin's three stages to structure your recommendations","Prioritise restraining forces by strength rather than listing them all equally","Connect to ADKAR Desire — staff fearing job loss will never develop Desire","Include a Refreeze plan to cement new ways of working"]}],
+qf:[{type:"match",prompt:"Match: Unfreeze (Lewin)",answer:"Dismantling existing habits and creating urgency for change",hint:"The hardest phase — fighting inertia and identity"},{type:"match",prompt:"Match: Refreeze (Lewin)",answer:"Cementing the new normal through systems and culture",hint:"The most skipped phase — declaring victory too early"},{type:"fill",prompt:"Lewin compared organisations to a block of ___.",answer:"ice",hint:"Melt it, reshape it, freeze it again"},{type:"fill",prompt:"Kotter's Steps 1-4 correspond to Lewin's ___ stage.",answer:"Unfreeze",hint:"Creating urgency, building coalition, vision, volunteer army"},{type:"acronym",prompt:"What are Lewin's 3 stages in order?",answer:"Unfreeze, Change, Refreeze",hint:"Think of ice — melt, reshape, freeze"}]},
+
+{id:"kotter",ti:"Kotter",co:"#a78bfa",ft:"Kotter's 8-Step Model",su:"Leading large-scale transformation",tg:"Leadership",mn:"Urgency → Coalition → Vision → Army → Barriers → Wins → Sustain → Culture",ov:"John Kotter (1996) studied 100+ organisations and identified 8 reasons change fails. Top-down and leadership-driven, designed for large-scale organisational transformation.",ki:"70% of change initiatives fail because leaders declare victory too soon at Step 7. Sustaining momentum after early wins is the hardest and most neglected part.",cn:"Kotter is the macro leadership model; ADKAR shows what must happen at the individual level. Use Kotter as your organisational roadmap and ADKAR to diagnose where individuals are stuck.",
+st:[{l:"1",w:"Create Urgency",d:"Make the case for change compellingly. Aim for 75% of management genuinely convinced.",t:"Without real urgency complacency kills the effort. Do not manufacture a false crisis — it backfires."},{l:"2",w:"Build a Guiding Coalition",d:"Assemble a team with authority, expertise, credibility, and leadership capacity across the organisation.",t:"You need champions across functions, levels, and influence networks — not just the CEO."},{l:"3",w:"Form a Strategic Vision",d:"Create a clear, compelling picture of the future and the practical strategy to achieve it.",t:"People resist the unknown. A vivid credible vision dramatically reduces fear and resistance."},{l:"4",w:"Enlist a Volunteer Army",d:"Get as many people as possible genuinely understanding and wanting the change — not just aware of it.",t:"Kotter updated this from Communicate the Vision — broad engagement beats top-down broadcast."},{l:"5",w:"Enable Action — Remove Barriers",d:"Identify and actively remove structural, systemic, or managerial obstacles blocking people from changing.",t:"Middle managers who subtly block change are one of the biggest hidden barriers. Address them directly."},{l:"6",w:"Generate Short-Term Wins",d:"Plan for and achieve visible, unambiguous early improvements that build credibility and momentum.",t:"Wins must be clearly connected to the change effort. Celebrate them loudly and publicly."},{l:"7",w:"Sustain Acceleration",d:"Use early wins to drive deeper broader change. Do not declare victory after initial successes.",t:"The most common failure point. Urgency fades, attention shifts, old culture reasserts itself."},{l:"8",w:"Institute Change in Culture",d:"Anchor the changes in culture, systems, hiring practices, and leadership behaviour permanently.",t:"Culture change comes LAST not first. Behaviour must visibly shift before culture follows."}],
+qz:[{q:"According to Kotter at what percentage of management buy-in should you proceed?",o:["75%","50%","60%","90%"],a:0,im:"Below 75% the coalition is too weak to overcome organisational resistance."},{q:"Which Kotter step is most commonly responsible for long-term change failure?",o:["Step 7 Sustain Acceleration","Step 2 Build Coalition","Step 5 Remove Barriers","Step 8 Culture"],a:0,im:"Leaders celebrate early wins then move on, causing urgency to fade before the change is embedded."},{q:"Why does culture change Step 8 come LAST in Kotter?",o:["Behaviour must shift before culture can follow","Culture is unimportant","Systems must be in place first","Leaders must approve cultural norms"],a:0,im:"Culture is the aggregate of shared behaviours — you cannot mandate a cultural shift."},{q:"Step 4 was updated by Kotter from Communicate the Vision to:",o:["Enlist a Volunteer Army","Train the organisation","Empower employees","Build momentum"],a:0,im:"Broadcasting top-down is insufficient — people must genuinely want to participate in the change."},{q:"The primary purpose of generating short-term wins Step 6 is:",o:["Build credibility and sustain momentum","Declare the change complete","Reward the change team","Satisfy stakeholder reporting"],a:0,im:"Wins prove the change is working, silence critics, motivate the volunteer army, and justify investment."}],
+wq:[{q:"A global bank is implementing a new ESG reporting framework across 40 countries. Use Kotter's 8-step model to design a change programme, identifying the two steps most likely to cause failure.",pr:"Apply all 8 steps briefly then go deeper on the two highest-risk steps. 200-300 words.",mo:"Step 1 Urgency: regulatory deadlines and investor ESG scoring pressures. Step 2 Coalition: requires country heads, Compliance, Finance, and Communications representatives. Step 3 Vision: ESG leadership drives long-term business value. Step 4 Army: country-level ESG champions and line managers as advocates. Step 5 Barriers: removing conflicting KPIs that incentivise short-term financial metrics over ESG. Step 6 Wins: early reporting successes in pilot countries shared publicly. Step 7 Sustain: maintaining CEO-level visibility. Step 8 Culture: embedding ESG into hiring, performance reviews, and leadership development. Highest-risk: Step 2 (country heads paying lip service without genuine commitment in a 40-country matrix) and Step 7 (urgency collapsing once initial deadlines are met before cultural embedding occurs).",im:["Apply each step to the specific scenario not generically","Justify the two highest-risk steps with evidence","Reference what failure at each step looks like in practice","Link Kotter to ADKAR for a richer answer","Consider middle management as barriers in a large matrix organisation"]}],
+qf:[{type:"fill",prompt:"According to Kotter, ___% of management must be genuinely convinced before proceeding with large-scale change.",answer:"75",hint:"Below this threshold the coalition is too weak"},{type:"fill",prompt:"Kotter's Step 7 is the most common failure point because ___ fades after early wins.",answer:"urgency",hint:"Leaders declare victory too soon and move on"},{type:"match",prompt:"Match: Kotter Step 1",answer:"Create Urgency",hint:"The burning platform — aim for 75% buy-in"},{type:"match",prompt:"Match: Kotter Step 8",answer:"Institute Change in Culture",hint:"Comes last — behaviour must shift before culture follows"},{type:"fill",prompt:"Culture change comes ___ not first in Kotter's model.",answer:"last",hint:"Behaviour must visibly shift before culture follows"},{type:"match",prompt:"Match: Kotter Step 6",answer:"Generate Short-Term Wins",hint:"Build credibility and sustain momentum"}]},
+
+{id:"ansoff",ti:"Ansoff",co:"#34d399",ft:"Ansoff's Growth Matrix",su:"Strategic growth and direction",tg:"Strategy",mn:"Penetrate → Develop Market → Develop Product → Diversify — risk increases each step",ov:"Igor Ansoff (1957) created this 2x2 matrix to help organisations decide their growth strategy. It plots Products (existing vs new) against Markets (existing vs new), with each quadrant carrying different risk levels.",ki:"The further you move from your core (existing products + existing markets) the higher the risk and the more transformational the change management effort required.",cn:"Ansoff defines WHERE to grow; ADKAR and Kotter define HOW to manage the people side of that strategic move. Use BCG to decide which products deserve Ansoff investment.",
+st:[{l:"Q1",w:"Market Penetration",d:"Sell MORE of existing products to existing markets. Lowest risk. Compete harder within current territory.",t:"Tactics: price cuts, promotions, loyalty schemes. Change impact: mostly operational efficiency improvements."},{l:"Q2",w:"Market Development",d:"Take existing products into NEW markets — new geographies, customer segments, or channels.",t:"Medium risk. Requires understanding new customer needs and adapting go-to-market significantly."},{l:"Q3",w:"Product Development",d:"Create NEW products for existing markets. Medium-high risk requiring R&D and innovation capability.",t:"Change is in processes, culture, and skills. Existing customer knowledge is the key asset."},{l:"Q4",w:"Diversification",d:"New products into new markets. Highest risk. Related vs Unrelated diversification.",t:"Related: existing capabilities in adjacent space. Unrelated: very high risk, requires full transformation."}],
+qz:[{q:"Which Ansoff quadrant carries the LOWEST risk?",o:["Market Penetration","Market Development","Product Development","Diversification"],a:0,im:"Existing products + existing markets = closest to core competencies = lowest risk."},{q:"A supermarket launching own-label products for existing shoppers is pursuing:",o:["Product Development","Market Development","Market Penetration","Diversification"],a:0,im:"New products (own-label) for existing markets (existing shoppers) = Product Development."},{q:"Related diversification means:",o:["Entering adjacent markets using existing capabilities","Acquiring completely unrelated businesses","Selling more to existing customers","Developing new products for familiar markets"],a:0,im:"Related diversification uses capabilities you already have in a new space."},{q:"Which Ansoff strategy requires the most comprehensive change management?",o:["Diversification","Market Penetration","Market Development","Product Development"],a:0,im:"New products AND new markets = furthest from core = most transformational change required."},{q:"The Ansoff matrix plots products against:",o:["Markets","Competitors","Risk levels","Revenue potential"],a:0,im:"The two axes are Products (existing vs new) and Markets (existing vs new). Risk increases as you move away."}],
+wq:[{q:"Netflix shifted from DVD rentals to streaming (2007) then to original content production (2013). Map each shift onto Ansoff's matrix and evaluate the change management implications.",pr:"Identify which quadrant each shift represents and explain the change management approach required. 200-300 words.",mo:"DVD to streaming = Market Development — existing service concept taken to a new distribution channel and potentially new customer segments. Required moderate change management: building new technical capabilities, repositioning brand, managing decline of the legacy DVD business simultaneously. Streaming to original content = Product Development or arguably Diversification — Netflix became a content studio competing with established Hollywood producers, requiring entirely new capabilities (commissioning, production, talent management), new organisational structures, and a content culture within a technology company. Kotter's Coalition Step 2 was critical: Netflix needed film industry expertise it did not possess. ADKAR Ability was the key gap — streaming engineers do not have content production skills.",im:["Be precise about which quadrant each shift belongs to and justify it","Do not just describe what happened — apply the Ansoff framework analytically","Connect each quadrant to the appropriate change management intensity","Link to BCG: which quadrant funded each strategic move?","Use Lewin's Force Field Analysis to identify internal barriers to each transition"]}],
+qf:[{type:"match",prompt:"Match: Lowest risk Ansoff quadrant",answer:"Market Penetration",hint:"Existing products, existing markets"},{type:"match",prompt:"Match: Highest risk Ansoff quadrant",answer:"Diversification",hint:"New products, new markets"},{type:"fill",prompt:"Ansoff's matrix plots ___ against markets.",answer:"products",hint:"The two axes of the 2x2 matrix"},{type:"fill",prompt:"Taking existing products into new markets is called Market ___.",answer:"Development",hint:"New geographies, segments, or channels"},{type:"match",prompt:"Match: New products for existing markets",answer:"Product Development",hint:"Requires R&D and innovation capability"}]},
+
+{id:"bcg",ti:"BCG Matrix",co:"#c4b5fd",ft:"BCG Growth-Share Matrix",su:"Portfolio analysis and investment decisions",tg:"Portfolio",mn:"Stars → Cash Cows → Question Marks → Dogs — think of their natural lifecycle",ov:"Created by Boston Consulting Group in 1970. Categorises business units or products by Market Growth Rate vs Relative Market Share to make investment, divestment, and resource allocation decisions.",ki:"The experience curve: high market share = lower unit costs over time. Cash Cows are the engine that funds Stars and selected Question Marks.",cn:"BCG pairs directly with Ansoff: Cash Cows fund Ansoff strategies. Stars need Market Penetration investment. Question Marks may need Market Development. Divesting Dogs frees cash and leadership focus.",
+st:[{l:"★",w:"Stars",d:"High growth, high market share. Category leaders in fast-growing markets requiring heavy investment to maintain position.",t:"Stars eventually become Cash Cows as the market matures. Protect them fiercely."},{l:"£",w:"Cash Cows",d:"Low growth, high market share. Mature, dominant, profitable businesses generating surplus cash.",t:"Milk strategically. Reinvest profits into Stars and promising Question Marks."},{l:"?",w:"Question Marks",d:"High growth, low market share. High potential or high risk — require honest strategic assessment.",t:"Invest selectively: back those with genuine differentiated potential, exit the rest decisively."},{l:"✕",w:"Dogs",d:"Low growth, low market share. Breakeven or loss-making. Consume management attention disproportionate to returns.",t:"Divest or harvest. Do not allocate leadership bandwidth here."}],
+qz:[{q:"In the BCG Matrix a Cash Cow has:",o:["Low growth, high share","High growth, low share","High growth, high share","Low growth, low share"],a:0,im:"Low growth market (mature) + high share (dominant) = surplus cash generation with less need to reinvest."},{q:"The BCG experience curve insight means:",o:["High market share leads to lower unit costs over time","High growth leads to higher margins","New markets always generate higher returns","Stars always become Cash Cows"],a:0,im:"Accumulated production experience reduces unit costs. Dominant share = more experience = competitive advantage."},{q:"A Question Mark should typically be:",o:["Assessed strategically and either invested in or exited","Always invested in heavily","Always divested immediately","Managed like a Cash Cow"],a:0,im:"Those with genuine competitive potential become Stars with investment; those without should be divested."},{q:"Which BCG quadrant has high market share in a low-growth market?",o:["Cash Cow","Star","Question Mark","Dog"],a:0,im:"High share + low growth = Cash Cow. Mature market but dominance means high profitability."},{q:"Dogs in the BCG matrix are typically recommended for:",o:["Divestment or harvesting remaining value","Heavy investment to grow market share","Maintaining current investment levels","Repositioning as Question Marks"],a:0,im:"Dogs consume resources without proportionate returns. Divest (sell) or harvest (extract remaining value)."}],
+wq:[{q:"Apply the BCG matrix to Apple's current product portfolio. Categorise at least 3 products and explain the investment strategy implications.",pr:"Be specific about market growth rates and Apple's relative market share. Link to strategic recommendations. 200-300 words.",mo:"iPhone = Cash Cow: global smartphone market has matured (low growth) but Apple holds dominant premium market share, generating the majority of revenue and profit. Apple Vision Pro = Question Mark: very high growth potential market (spatial computing is nascent) but extremely low current market share. Apple Services (iCloud, Apple TV+, App Store) = Star: digital services market continues to grow and Apple leverages its massive installed base to build high-margin recurring revenue with growing share. Investment implications: iPhone Cash Cow profits fund Vision Pro development (Question Mark bet) and Services expansion (Star consolidation). The experience curve explains why Apple's Services share creates competitive advantage — accumulated data and ecosystem scale reduce per-user costs.",im:["Justify each categorisation with specific data about market growth rate and Apple's share","Address BCG's limitations — it oversimplifies multi-factor strategic decisions","Link BCG to Ansoff for each recommended investment strategy","Use the experience curve concept explicitly","Consider the portfolio lifecycle: how does a Star become a Cash Cow?"]}],
+qf:[{type:"match",prompt:"Match: High growth, High share",answer:"Star",hint:"Invest heavily to maintain — future Cash Cow"},{type:"match",prompt:"Match: Low growth, High share",answer:"Cash Cow",hint:"Milk strategically — funds the rest of the portfolio"},{type:"match",prompt:"Match: High growth, Low share",answer:"Question Mark",hint:"Invest selectively or exit"},{type:"match",prompt:"Match: Low growth, Low share",answer:"Dog",hint:"Divest or harvest remaining value"},{type:"fill",prompt:"The BCG experience curve states that high market ___ leads to lower unit costs over time.",answer:"share",hint:"Accumulated production experience reduces costs"},{type:"fill",prompt:"Cash Cows should fund ___ and promising Question Marks.",answer:"Stars",hint:"The portfolio investment logic — profitable matures fund high-potential growth"}]},
+
+{id:"digital",ti:"Digital",co:"#6ee7b7",ft:"Digital Transformation",su:"Change resistance and readiness",tg:"Context",mn:"VUCA world: Readiness = Ability x Willingness",ov:"Digital transformation integrates digital technology across all business areas, fundamentally changing operations and value delivery. It is the ultimate change management challenge — cultural, structural, and technological change all happening simultaneously.",ki:"Gartner research shows 70% of digital transformations fail. The number one cause is culture and people — not technology. The platform is never the problem.",cn:"Digital transformation is the ultimate test of all frameworks: ADKAR to move individuals, Kotter for organisational leadership, Lewin for structural thinking, Ansoff for strategic direction, BCG for portfolio prioritisation.",
+st:[{l:"R",w:"Resistance to Change",d:"A normal human response to perceived loss of control, uncertainty, or threat to identity. Not stubbornness — it is psychological self-protection.",t:"Kubler-Ross Change Curve: Denial, Anger, Bargaining, Depression, Acceptance. Meet people at their current stage."},{l:"T",w:"Types of Resistance",d:"Overt (vocal opposition), Covert (quiet sabotage), Active (direct blocking actions), Passive (disengagement).",t:"Covert and passive resistance is most dangerous — you cannot manage what you cannot see."},{l:"C",w:"Causes of Resistance",d:"Fear of redundancy, poor communication, past change failures, loss of status, power, or expertise.",t:"Address root causes not symptoms. Communicating more does not equal communicating better."},{l:"A",w:"Change Readiness",d:"An organisation's capacity and willingness to undertake change successfully. Assessed before transformation begins.",t:"Readiness assessments cover: leadership alignment, culture health, capability, infrastructure, and change history."},{l:"D",w:"Digital Readiness Factors",d:"Digital literacy, agile mindset, data-driven culture, leadership digital vision, psychological safety, tech infrastructure maturity.",t:"McKinsey: the single biggest predictor of digital transformation success is personal CEO commitment."}],
+qz:[{q:"According to Gartner what percentage of digital transformations fail?",o:["70%","40%","55%","85%"],a:0,im:"70% failure rate — culture and people cited as the primary cause, not technology."},{q:"Which type of resistance is most dangerous and hardest to manage?",o:["Covert passive resistance","Overt active resistance","Vocal opposition","Organised union pushback"],a:0,im:"Covert passive resistance is invisible — people appear to comply but do not change their actual behaviour."},{q:"The Kubler-Ross Change Curve originally described:",o:["Stages of grief","Organisational restructuring stages","Product lifecycle stages","Market entry challenges"],a:0,im:"Kubler-Ross developed the model for grief and loss — later applied to organisational change."},{q:"In VUCA what does the A stand for?",o:["Ambiguity","Agility","Alignment","Acceleration"],a:0,im:"VUCA: Volatility, Uncertainty, Complexity, Ambiguity. Most relevant to digital transformation contexts."},{q:"McKinsey identifies the biggest predictor of digital transformation success as:",o:["Personal CEO commitment","Technology budget size","Employee training investment","Number of external consultants"],a:0,im:"CEO sponsorship signals the transformation is a genuine strategic priority not an IT project."}],
+wq:[{q:"A traditional high street retailer is embarking on a digital transformation. Using at least THREE change management frameworks design an integrated approach to managing the human side.",pr:"Apply at least ADKAR, Kotter, and one other framework. Show how they work together rather than separately. 250-350 words.",mo:"Deploy Kotter at the organisational level, ADKAR at the individual level, and Lewin's Force Field Analysis as a diagnostic tool. Beginning with Lewin: driving forces (existential competitive threat from Amazon/ASOS, declining footfall, board targets) and restraining forces (staff fear of job displacement, middle management comfort with existing processes, lack of digital skills, historic failed tech projects). Reducing restraining forces is more urgent than amplifying driving forces. Kotter: Urgency via footfall decline data and competitive benchmarking; Coalition including digital-savvy external appointments alongside trusted internal voices; Vision framing digital as enabling colleagues to serve customers better not replacing them; Step 7 is the highest failure risk — pressure to declare victory after a pilot is enormous. ADKAR operates in parallel: Awareness of competitive threat, Desire via WIIFM (new skills, career development), Knowledge via digital skills training, Ability through in-store coaching, Reinforcement recognising digital adoption behaviours.",im:["Show HOW the frameworks integrate not just list them separately","Apply Force Field Analysis before designing the programme to diagnose barriers","Link ADKAR to specific staff groups — store colleagues vs managers vs head office","Address the Refreeze stage — what does the new cultural norm look like?","Reference Brynjolfsson and McAfee on technology and workforce impact"]}],
+qf:[{type:"fill",prompt:"According to Gartner, ___% of digital transformations fail.",answer:"70",hint:"Culture and people are the primary cause — not technology"},{type:"fill",prompt:"VUCA stands for Volatility, Uncertainty, ___, and Ambiguity.",answer:"Complexity",hint:"Many interconnected factors at play simultaneously"},{type:"match",prompt:"Match: Covert resistance",answer:"Quiet sabotage — appearing to comply but not changing behaviour",hint:"The most dangerous and invisible type of resistance"},{type:"match",prompt:"Match: Kubler-Ross stages",answer:"Denial, Anger, Bargaining, Depression, Acceptance",hint:"Originally developed for grief — applied to organisational change"},{type:"fill",prompt:"McKinsey found that personal ___ commitment is the biggest predictor of digital transformation success.",answer:"CEO",hint:"Leadership at the very top signals this is a genuine strategic priority"}]},
+
+{id:"aiwork",ti:"AI & Work",co:"#34d399",ft:"AI, Automation and the Future of Work",su:"From mechanical automation to AI-driven decision-making",tg:"Unit 2",mn:"Mechanical → Smart → Autonomous: each leap needs a change strategy not just a tech upgrade",ov:"Workplaces are shifting from mechanical automation to AI-driven decision-making. The WEF (2025) predicts AI will displace 85 million jobs but create 97 million new ones focused on data analytics, ML, and AI governance.",ki:"AI is not simply replacing people — it is reshaping what people do. Tesla's over-automation failure proved that removing humans entirely backfires. AI must augment human capability, not eliminate it.",cn:"This unit directly applies ADKAR to AI adoption. Lewin's unfreeze applies to breaking mechanical automation mindsets. Kotter's urgency is critical for building the case for AI investment.",
+st:[{l:"1",w:"Mechanical Automation",d:"Robotic arms and fixed-instruction machines perform repetitive tasks. Tesla's early gigafactories hit a wall: over-automation created complexity and demanded human firefighting.",t:"This reflects Lewin's frozen state — efficient but rigid. Change is needed when the environment shifts."},{l:"2",w:"AI-Enhanced Manufacturing",d:"Machine learning, computer vision, and predictive analytics layered on automation. Systems now self-correct, optimise in real time, and predict failures before they happen.",t:"Tesla's predictive maintenance AI flags failures before downtime occurs — saving cost and production time."},{l:"3",w:"AI Decision-Making and Autonomy",d:"AI moves from executing tasks to making decisions — FSD, supply chain optimisation, demand forecasting. Tesla's Dojo supercomputer processes vast video datasets to train autonomous driving models.",t:"Dojo = Dynamic Capabilities Framework in action: reconfiguring internal AI infrastructure for competitive advantage."},{l:"4",w:"Workforce Displacement and Reskilling",d:"Automation displaces roles but creates new ones (ML engineers, AI governance, data analysts). IBM and Google have launched major upskilling programmes. The ethical obligation is to reskill proactively.",t:"Brynjolfsson and McAfee (2014): The Second Machine Age — AI creates abundance but also inequality."},{l:"5",w:"Algorithmic Bias and Ethics",d:"AI systems trained on biased data reproduce and amplify those biases. Amazon's recruitment AI favoured male candidates because historical hiring data was male-dominated.",t:"Three ethical imperatives: (1) Bias auditing, (2) Transparency in decisions, (3) Human oversight in high-stakes AI decisions."},{l:"6",w:"Strategic AI Alignment",d:"AI must be aligned with organisational strategy, values, and governance. Culture, structure, capability, and ethical frameworks must evolve alongside the technology.",t:"Apply ADKAR to AI adoption: Awareness of why AI, Desire to engage, Knowledge of how, Ability through training, Reinforcement through recognition of AI-augmented performance."}],
+qz:[{q:"What was Tesla's key lesson from its early over-automation phase?",o:["Removing humans entirely created complexity and inflexibility","Robots are always more efficient than humans","Mechanical automation is sufficient for modern manufacturing","Full automation eliminates the need for change management"],a:0,im:"Tesla had to bring human workers BACK to handle variations and problems machines could not adapt to."},{q:"Tesla's Dojo supercomputer is primarily used for:",o:["Processing video data to train autonomous driving AI models","Managing HR and payroll","Controlling robotic arms on assembly lines","Running supply chain logistics"],a:0,im:"Dojo processes vast video data from Tesla's global fleet to continuously improve FSD algorithms."},{q:"According to WEF (2025) how many new jobs is AI expected to create?",o:["97 million","45 million","70 million","85 million"],a:0,im:"85 million jobs displaced but 97 million new roles created — net positive but major disruption in transition."},{q:"Amazon's AI recruitment tool demonstrated which ethical risk?",o:["Algorithmic bias","Workforce displacement","Cybersecurity vulnerability","Lack of human oversight"],a:0,im:"The AI learned from historical male-dominated hiring data and penalised CVs associated with women. Bias in = bias out."},{q:"Which framework best explains Tesla's Dojo as a source of competitive advantage?",o:["Dynamic Capabilities Framework","Ansoff's Growth Matrix","BCG Matrix","Lewin's Force Field Analysis"],a:0,im:"Dynamic Capabilities: sense opportunities, seize them, and reconfigure internal capabilities. Dojo is a reconfiguration."}],
+wq:[{q:"Critically evaluate the ethical implications of AI-driven hiring systems using at least two academic or industry references and applying relevant change management frameworks.",pr:"Consider both risks (algorithmic bias, displacement) and potential benefits. Apply ADKAR or another framework to explain how organisations should manage the adoption of AI hiring tools. 250-350 words.",mo:"AI-driven hiring offers efficiency gains — processing thousands of CVs at scale. However as demonstrated by the Amazon case (2018), AI systems trained on historical data reproduce existing inequalities. Danks and London (2017) identify algorithmic bias as a systemic risk arising from biased training data, biased design choices, and biased use contexts. From a change management perspective, ADKAR applies: Awareness must include honest communication about limitations. Desire is difficult to build among HR professionals fearing replacement — WIIFM framing is critical: AI as augmentation not replacement. Ability requires training not just in using the tool but in critically evaluating its outputs. Reinforcement mechanisms must include mandatory human review of AI-generated shortlists and bias audit processes. The fundamental ethical imperative is accountability: humans must remain responsible for hiring decisions even when AI is involved.",im:["Reference Danks and London 2017, Brynjolfsson and McAfee 2014, Frey and Osborne 2017","Apply a change management framework explicitly to the adoption of the AI tool itself","Address the tension between efficiency gains and fairness risks — this is genuinely contested","Discuss EU AI Act: hiring AI is high-risk requiring human oversight","Conclude with your own evaluative position not just a description of the issues"]}],
+qf:[{type:"fill",prompt:"WEF (2025) predicts AI will displace ___ million jobs but create 97 million new ones.",answer:"85",hint:"Net positive — but major disruption in the transition period"},{type:"fill",prompt:"Amazon's AI recruitment tool was biased because its training data was dominated by ___.",answer:"men",hint:"Bias in training data = bias in outputs — Danks and London 2017"},{type:"match",prompt:"Match: Tesla Dojo supercomputer",answer:"Processes video data to train Full Self-Driving AI models at scale",hint:"Dynamic Capabilities Framework in action"},{type:"fill",prompt:"Brynjolfsson and McAfee argue that AI creates abundance but also significant ___ risks.",answer:"inequality",hint:"Benefits concentrate unevenly — widening the gap"},{type:"match",prompt:"Match: Algorithmic bias",answer:"When AI systems trained on biased data reproduce and amplify existing inequalities",hint:"Amazon recruitment case is the key example — bias in = bias out"}]}
+];
+
+// ── APP STATE ─────────────────────────────────────────────────────────────────
+var state = {
+  tab: 'revision',
+  theories: [],
+  activeTheory: 0,
+  openStep: null,
+  pickedColor: '#10b981',
+  // quiz
+  quizMode: null, quizTopics: [], quizQs: [], quizCur: 0, quizAnswers: [], quizChosen: null,
+  // quickfire
+  qfMode: null, qfTopics: [], qfQs: [], qfCur: 0, qfScore: 0, qfHistory: [], qfFeedback: null, qfTimeLeft: 60, qfTimerActive: false,
+  // tutor
+  chatMessages: [], chatLoading: false,
+  // self-rate
+  selfRating: null, showModel: false, wAnswer: ''
+};
+var qfTimerInterval = null;
+var deferredInstallPrompt = null;
+
+// ── STORAGE ───────────────────────────────────────────────────────────────────
+function lsGet(key) { try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch(e) { return null; } }
+function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); return true; } catch(e) { return false; } }
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+function init() {
+  // Load custom topics from localStorage
+  var custom = lsGet('cm_custom_topics') || [];
+  state.theories = THEORIES_BUILTIN.concat(custom);
+
+  // Load chat history
+  var saved_chat = lsGet('cm_chat_history');
+  if (saved_chat && saved_chat.length) {
+    state.chatMessages = saved_chat;
+  } else {
+    state.chatMessages = [{role:'assistant', content:"Hi! I'm your Change Management AI Tutor 👋\n\nI can:\n• Explain any theory in simpler terms\n• Quiz you conversationally on any topic\n• Answer questions about the frameworks\n• Connect theories together\n\nTry asking: \"Explain ADKAR to me simply\" or \"Quiz me on Kotter\" or \"What's the difference between Lewin and ADKAR?\"", time: now()}];
+  }
+
+  // PWA install prompt
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    var banner = document.getElementById('installBanner');
+    if (banner) banner.style.display = 'block';
+  });
+  document.getElementById('installBtn').addEventListener('click', function() {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      deferredInstallPrompt.userChoice.then(function() { document.getElementById('installBanner').style.display='none'; });
+    }
+  });
+
+  // Color picker
+  document.getElementById('colorPicker').addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-color]');
+    if (!btn) return;
+    state.pickedColor = btn.getAttribute('data-color');
+    document.querySelectorAll('.color-dot').forEach(function(d) { d.classList.remove('picked'); });
+    btn.classList.add('picked');
+  });
+
+  // Service worker
+  if ('serviceWorker' in navigator) {
+    var swCode = 'self.addEventListener("install",function(e){self.skipWaiting();});self.addEventListener("fetch",function(e){if(e.request.url.includes("api.anthropic.com")){return;}e.respondWith(fetch(e.request).catch(function(){return caches.match(e.request);}));});';
+    var blob = new Blob([swCode], {type:'application/javascript'});
+    var swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl).catch(function(){});
+  }
+
+  render();
+  document.getElementById('loader').style.display = 'none';
+}
+
+function now() { return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+function shuf(a) { var b=a.slice(); for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;} return b; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render() {
+  var app = document.getElementById('app');
+  var pages = {revision: renderRevision, quickfire: renderQuickfire, quiz: renderQuiz, tutor: renderTutor};
+  if (pages[state.tab]) {
+    app.innerHTML = pages[state.tab]() + renderNav();
+  }
+  bindEvents();
+  // Scroll to bottom in tutor
+  if (state.tab === 'tutor') {
+    var cb = document.getElementById('chatBottom');
+    if (cb) cb.scrollIntoView();
+  }
+}
+
+function renderNav() {
+  var tabs = [{id:'revision',icon:'📖',label:'Revision'},{id:'quickfire',icon:'⚡',label:'Quick-Fire'},{id:'quiz',icon:'🧠',label:'Quiz'},{id:'tutor',icon:'💬',label:'AI Tutor'}];
+  var h = '<nav class="nav">';
+  tabs.forEach(function(t) {
+    var active = state.tab === t.id;
+    h += '<button class="nav-btn'+(active?' active':'')+'" onclick="switchTab(\''+t.id+'\')">'
+      +'<span class="nav-icon">'+t.icon+'</span>'
+      +'<span>'+t.label+'</span>'
+      +(active?'<div class="nav-indicator"></div>':'')
+      +'</button>';
+  });
+  return h + '</nav>';
+}
+
+function switchTab(t) { state.tab = t; render(); window.scrollTo(0,0); }
+
+// ══ REVISION ═══════════════════════════════════════════════════════════════════
+function renderRevision() {
+  var t = state.theories[state.activeTheory] || state.theories[0];
+
+  // TABS
+  var tabsH = '<div class="tabs">';
+  state.theories.forEach(function(th, i) {
+    var active = i === state.activeTheory;
+    tabsH += '<button class="tab-btn'+(active?' active':'')+'" style="'+(active?'background:'+th.co+';':'')+'" onclick="setTheory('+i+')">'+esc(th.ti)+'</button>';
+  });
+  tabsH += '<button class="add-tab-btn" onclick="openAddModal()">＋ Add</button></div>';
+
+  // TOPBAR
+  var topbar = '<div class="topbar"><div class="topbar-inner">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    +'<div><div style="font-size:10px;color:var(--mu);letter-spacing:2.5px;text-transform:uppercase">7WBS2034</div>'
+    +'<div style="font-size:18px;font-weight:900;background:linear-gradient(90deg,var(--em2),var(--pu2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Change Management</div></div>'
+    +'<button class="btn btn-em" style="padding:7px 13px;font-size:12px;animation:none" onclick="openAddModal()">＋ Add Topic</button>'
+    +'</div>'+tabsH+'</div></div>';
+
+  // HERO
+  var hero = '<div class="card-hero fadeUp" style="background:linear-gradient(135deg,'+t.co+'12,rgba(139,92,246,0.05));border-color:'+t.co+'30;margin-bottom:16px">'
+    +'<span class="tag" style="background:'+t.co+'22;color:'+t.co+';border-color:'+t.co+'44">'+esc(t.tg||'')+'</span>'
+    +'<h2 style="font-size:20px;font-weight:900;color:'+t.co+';margin:8px 0 4px">'+esc(t.ft)+'</h2>'
+    +'<div style="color:var(--mu);font-size:13px;margin-bottom:14px">'+esc(t.su||'')+'</div>'
+    +'<p style="color:#c8d8e8;font-size:14px;line-height:1.7;margin-bottom:14px">'+esc(t.ov||'')+'</p>'
+    +'<div style="border-left:3px solid '+t.co+';padding-left:14px;margin-bottom:14px">'
+    +'<div style="font-size:10px;font-weight:700;color:'+t.co+';text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px">Key Insight</div>'
+    +'<div style="color:#e0eef8;font-size:13px;line-height:1.65">'+esc(t.ki||'')+'</div></div>'
+    +'<div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 14px">'
+    +'<div style="font-size:10px;color:var(--fa);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:3px">Memory Hook</div>'
+    +'<div style="color:var(--mu);font-size:12px;line-height:1.6">'+esc(t.mn||'')+'</div>'
+    +'</div></div>';
+
+  // STEPS
+  var stepsH = '<div style="font-size:10px;color:var(--fa);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:10px;font-weight:600">The Framework — tap each to expand</div>';
+  (t.st||[]).forEach(function(s,i) {
+    var open = state.openStep === i;
+    stepsH += '<div class="step-item'+(open?' open':'')+'" onclick="toggleStep('+i+')" style="animation-delay:'+(i*0.05)+'s">'
+      +'<div class="step-hdr">'
+      +'<div class="step-letter" style="'+(open?'background:'+t.co+';color:#000;border-color:'+t.co:'')+'">'+esc(s.l)+'</div>'
+      +'<div style="flex:1;min-width:0">'
+      +'<div class="step-word">'+esc(s.w)+'</div>'
+      +'<div class="step-prev">'+esc(s.d)+'</div>'
+      +'</div>'
+      +'<div class="step-chev">▼</div></div>'
+      +(open?'<div class="step-body fadeUp">'
+        +'<p style="color:#c8d8e8;font-size:13px;line-height:1.7;margin-bottom:12px">'+esc(s.d)+'</p>'
+        +(s.t?'<div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:10px 13px">'
+          +'<span style="color:var(--pu2);font-weight:700;font-size:12px">Exam tip: </span>'
+          +'<span style="color:#c8d8e8;font-size:12px;line-height:1.6">'+esc(s.t)+'</span></div>':'')
+        +'</div>':'')
+      +'</div>';
+  });
+
+  // CONNECTIONS + RECALL
+  var conn = t.cn ? '<div class="card" style="margin-top:8px">'
+    +'<div style="font-size:10px;color:var(--fa);text-transform:uppercase;letter-spacing:2.5px;margin-bottom:8px;font-weight:600">How It Connects</div>'
+    +'<p style="color:var(--mu);font-size:13px;line-height:1.7">'+esc(t.cn)+'</p></div>' : '';
+
+  var chips = '';
+  (t.st||[]).forEach(function(s) {
+    chips += '<div style="background:'+t.co+'18;border:1px solid '+t.co+'30;border-radius:8px;padding:5px 10px;font-size:12px">'
+      +'<b style="color:'+t.co+'">'+esc(s.l)+'</b> <span style="color:var(--mu)">'+esc(s.w)+'</span></div>';
+  });
+  var recall = '<div style="background:linear-gradient(135deg,rgba(16,185,129,0.07),rgba(139,92,246,0.07));border:1px solid rgba(16,185,129,0.2);border-radius:14px;padding:14px;margin-top:8px">'
+    +'<div style="font-size:10px;color:'+t.co+';text-transform:uppercase;letter-spacing:2.5px;margin-bottom:10px;font-weight:700">Quick Recall</div>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:6px">'+chips+'</div></div>';
+
+  return topbar+'<div class="page" style="padding-top:116px">'+hero+stepsH+conn+recall+'</div>';
+}
+
+function setTheory(i) { state.activeTheory = i; state.openStep = null; render(); }
+function toggleStep(i) { state.openStep = state.openStep===i?null:i; render(); }
+
+// ══ ADD TOPIC ═══════════════════════════════════════════════════════════════════
+function openAddModal() { document.getElementById('addModal').classList.add('show'); }
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('show');
+  document.getElementById('addForm').style.display='block';
+  document.getElementById('addProgress').style.display='none';
+  document.getElementById('addDone').style.display='none';
+  document.getElementById('at-name').value='';
+  document.getElementById('at-sub').value='';
+  document.getElementById('at-notes').value='';
+  document.getElementById('at-tag').value='';
+  document.getElementById('at-err').style.display='none';
+  document.getElementById('at-gen-btn').disabled=false;
+}
+
+function generateTopic() {
+  var name = document.getElementById('at-name').value.trim();
+  var sub = document.getElementById('at-sub').value.trim();
+  var notes = document.getElementById('at-notes').value.trim();
+  var tag = document.getElementById('at-tag').value.trim() || 'Custom';
+  var errEl = document.getElementById('at-err');
+
+  if (!name) { errEl.textContent='Please enter a theory name.'; errEl.style.display='block'; return; }
+  if (notes.length < 30) { errEl.textContent='Please add more detail to your notes (at least a few sentences).'; errEl.style.display='block'; return; }
+
+  errEl.style.display='none';
+  document.getElementById('addForm').style.display='none';
+  document.getElementById('addProgress').style.display='block';
+  document.getElementById('at-gen-btn').disabled=true;
+
+  var steps = ['Reading your notes','Structuring key concepts','Writing exam tips','Generating quiz questions','Building quick-fire tests','Adding model answers','Finalising your topic'];
+  var si = 0;
+  var stepEl = document.getElementById('addStep');
+  var timer = setInterval(function() { si=(si+1)%steps.length; if(stepEl)stepEl.textContent=steps[si]; }, 1300);
+
+  var prompt = 'You are an expert academic tutor for a postgraduate change management module. A student is studying: "'+name+'". Sub-focus: "'+(sub||'general')+'".\n\nTheir notes:\n'+notes+'\n\nGenerate a complete revision topic object in STRICT JSON format. No markdown, no explanation, just raw JSON matching this structure exactly:\n\n{"id":"'+name.toLowerCase().replace(/[^a-z0-9]/g,'_').slice(0,20)+'_'+Date.now()+'","ti":"'+name.slice(0,18)+'","co":"'+state.pickedColor+'","ft":"'+name.slice(0,45)+'","su":"'+(sub||'Key concepts and applications').slice(0,60)+'","tg":"'+tag.slice(0,15)+'","mn":"A memorable mnemonic or hook for this theory","ov":"2-3 sentence overview, accurate and exam-focused","ki":"The single most important exam insight","cn":"How this theory connects to ADKAR, Kotter, Lewin, Ansoff, BCG, or Digital Transformation","st":[{"l":"1","w":"First Key Concept","d":"Detailed 2-3 sentence explanation","t":"Specific exam tip"},{"l":"2","w":"Second Key Concept","d":"...","t":"..."},{"l":"3","w":"Third Key Concept","d":"...","t":"..."},{"l":"4","w":"Fourth Key Concept","d":"...","t":"..."}],"dg":"none","qz":[{"q":"Exam-style MC question","o":["Correct answer","Wrong 1","Wrong 2","Wrong 3"],"a":0,"im":"Why correct and what to remember"},{"q":"Q2","o":["Correct","Wrong 1","Wrong 2","Wrong 3"],"a":0,"im":"Study note"},{"q":"Q3","o":["Correct","Wrong 1","Wrong 2","Wrong 3"],"a":0,"im":"Study note"},{"q":"Q4","o":["Correct","Wrong 1","Wrong 2","Wrong 3"],"a":0,"im":"Study note"},{"q":"Q5","o":["Correct","Wrong 1","Wrong 2","Wrong 3"],"a":0,"im":"Study note"},{"q":"Q6","o":["Correct","Wrong 1","Wrong 2","Wrong 3"],"a":0,"im":"Study note"}],"wq":[{"q":"Essay-style exam question","pr":"Guidance prompt, 200-300 words","mo":"Comprehensive model answer with specific details and academic references","im":["Improvement point 1","Improvement point 2","Improvement point 3","Improvement point 4","Improvement point 5"]}],"qf":[{"type":"fill","prompt":"Fill in the blank: ___ is ...","answer":"Answer","hint":"Hint"},{"type":"fill","prompt":"Second fill question","answer":"Answer","hint":"Hint"},{"type":"match","prompt":"Match: Key term","answer":"Its definition","hint":"Hint"},{"type":"match","prompt":"Match: Another term","answer":"Its pair","hint":"Hint"},{"type":"acronym","prompt":"What does X stand for?","answer":"Full word","hint":"Hint"}]}\n\nCRITICAL: Return ONLY valid JSON. The "a" field must always be 0. Make all questions exam-realistic and accurate.';
+
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:3000,messages:[{role:'user',content:prompt}]})
+  }).then(function(r){return r.json();}).then(function(data){
+    clearInterval(timer);
+    document.getElementById('addProgress').style.display='none';
+    if(data.error){showAddErr('API error: '+(data.error.message||'Unknown error'));return;}
+    var raw=data.content.filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
+    raw=raw.replace(/^```[a-z]*\n?/i,'').replace(/\n?```$/,'').trim();
+    var s=raw.indexOf('{'),e=raw.lastIndexOf('}');
+    if(s<0||e<0){showAddErr('Could not parse AI response. Please try again.');return;}
+    try{
+      var topic=JSON.parse(raw.slice(s,e+1));
+      if(!topic.id||!topic.ti||!topic.st||!topic.qz){showAddErr('Generated topic was incomplete. Please try again.');return;}
+      if(!topic.qf)topic.qf=[];
+      // Save to localStorage
+      state.theories.push(topic);
+      var custom=state.theories.filter(function(t){return !THEORIES_BUILTIN.find(function(b){return b.id===t.id;});});
+      lsSet('cm_custom_topics',custom);
+      state.activeTheory=state.theories.length-1;
+      // Show done
+      document.getElementById('addDone').innerHTML='<div class="pop" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:16px;padding:24px;text-align:center">'
+        +'<div style="font-size:40px;margin-bottom:12px">🎉</div>'
+        +'<div style="font-size:16px;font-weight:800;color:var(--em2);margin-bottom:8px">'+esc(topic.ft)+'</div>'
+        +'<div style="color:var(--mu);font-size:13px;line-height:1.7;margin-bottom:16px">'+esc(topic.ov||'')+'</div>'
+        +'<div style="color:var(--fa);font-size:12px;margin-bottom:20px">'+topic.st.length+' concepts · '+topic.qz.length+' MC questions · '+(topic.wq?topic.wq.length:0)+' essay question · '+(topic.qf?topic.qf.length:0)+' quick-fire items · Saved permanently ✓</div>'
+        +'<div style="display:flex;gap:8px">'
+        +'<button class="btn btn-ghost" style="flex:1;padding:12px" onclick="closeAddModal();resetAdd()">Add Another</button>'
+        +'<button class="btn btn-primary" style="flex:1.5;padding:12px;animation:none" onclick="closeAddModal();render()">View My Topics</button>'
+        +'</div></div>';
+      document.getElementById('addDone').style.display='block';
+    }catch(e2){showAddErr('JSON parse error. Try again or simplify your notes. ('+e2.message+')');}
+  }).catch(function(err){
+    clearInterval(timer);
+    document.getElementById('addProgress').style.display='none';
+    document.getElementById('addForm').style.display='block';
+    showAddErr('Network error. Check your connection and try again. ('+(err.message||err)+')');
+  });
+}
+
+function showAddErr(msg) {
+  document.getElementById('addProgress').style.display='none';
+  document.getElementById('addForm').style.display='block';
+  var e=document.getElementById('at-err');e.textContent=msg;e.style.display='block';
+  document.getElementById('at-gen-btn').disabled=false;
+}
+function resetAdd() { closeAddModal(); }
+
+// ══ QUICK-FIRE ════════════════════════════════════════════════════════════════
+function renderQuickfire() {
+  var s = state;
+  if (!s.qfMode || s.qfMode === 'home') return renderQFHome();
+  if (s.qfMode === 'config') return renderQFConfig();
+  if (s.qfMode === 'playing') return renderQFPlay();
+  if (s.qfMode === 'results') return renderQFResults();
+  return renderQFHome();
+}
+
+function renderQFHome() {
+  var modes = [
+    {id:'match',icon:'🔀',label:'Match',desc:'Match a term to its definition or paired concept'},
+    {id:'fill',icon:'✏️',label:'Fill the Blank',desc:'Complete the missing word in a key statement'},
+    {id:'acronym',icon:'🔤',label:'Acronym Recall',desc:'What does each letter stand for? (ADKAR, VUCA...)'},
+    {id:'timed',icon:'⏱️',label:'60-Second Sprint',desc:'All question types — answer as many as you can before time runs out'},
+  ];
+  var h='<div class="page"><h1 style="font-size:22px;font-weight:900;margin-bottom:4px">⚡ Quick-Fire Tests</h1>'
+    +'<p style="color:var(--mu);font-size:13px;margin-bottom:24px;line-height:1.6">Sharp, fast-paced tests across all your theories. Type your answer and press Enter.</p>'
+    +'<div style="font-size:10px;color:var(--fa);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-weight:600">Choose Mode</div>';
+  modes.forEach(function(m) {
+    h+='<div class="card fadeUp" style="cursor:pointer;display:flex;align-items:center;gap:14px" onclick="startQFConfig(\''+m.id+'\')">'
+      +'<div style="width:44px;height:44px;border-radius:12px;background:rgba(16,185,129,0.12);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">'+m.icon+'</div>'
+      +'<div style="flex:1"><div style="font-weight:700;font-size:15px;margin-bottom:3px">'+m.label+'</div>'
+      +'<div style="color:var(--mu);font-size:12px;line-height:1.5">'+m.desc+'</div></div>'
+      +'<div style="color:var(--fa);font-size:18px">›</div></div>';
+  });
+  return h+'</div>';
+}
+
+function renderQFConfig() {
+  var s = state;
+  var h='<div class="page"><div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">'
+    +'<button class="btn btn-ghost" onclick="state.qfMode=\'home\';render()">← Back</button>'
+    +'<div style="font-weight:800;font-size:16px">'
+    +({match:'🔀 Match',fill:'✏️ Fill the Blank',acronym:'🔤 Acronym Recall',timed:'⏱️ 60-Second Sprint'}[s.qfMode]||'')+'</div></div>'
+    +'<div style="font-size:10px;color:var(--fa);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-weight:600">Choose Topics</div>'
+    +'<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">'
+    +'<button class="btn btn-em" onclick="qfSelectAll()">All</button>'
+    +'<button class="btn btn-ghost" onclick="qfSelectNone()">None</button></div>';
+  s.theories.forEach(function(t,i) {
+    var sel = s.qfTopics.indexOf(t.id)>=0;
+    var qfCount = (t.qf||[]).length;
+    h+='<div class="card" style="cursor:pointer;display:flex;align-items:center;gap:10px;border-color:'+(sel?t.co+'55':'')+';background:'+(sel?t.co+'0a':'')+';" onclick="qfToggleTopic(\''+t.id+'\')">'
+      +'<div style="width:10px;height:10px;border-radius:50%;background:'+t.co+';flex-shrink:0"></div>'
+      +'<div style="flex:1"><div style="font-weight:700;font-size:13px">'+esc(t.ft)+'</div>'
+      +'<div style="font-size:11px;color:var(--fa)">'+qfCount+' quick-fire items</div></div>'
+      +'<div style="width:22px;height:22px;border-radius:6px;background:'+(sel?t.co:'var(--bdr)')+';display:flex;align-items:center;justify-content:center;font-size:12px;color:'+(sel?'#000':'transparent')+';transition:all 0.15s">✓</div></div>';
+  });
+  h+='<button class="btn btn-primary btn-full" style="margin-top:12px" onclick="launchQF()" '+(s.qfTopics.length?'':'disabled')+'>Start '+(s.qfMode==='timed'?'60-Second Sprint':'Test')+' →</button>';
+  return h+'</div>';
+}
+
+function renderQFPlay() {
+  var s = state;
+  var qs = s.qfQs;
+  if (!qs.length || s.qfCur >= qs.length) { s.qfMode='results'; return renderQFResults(); }
+  var q = qs[s.qfCur];
+  var pct = s.qfMode==='timed' ? 0 : Math.round((s.qfCur/qs.length)*100);
+
+  var topRow = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    +'<button class="btn btn-ghost" onclick="exitQF()">✕ Exit</button>'
+    +'<div style="display:flex;align-items:center;gap:10px">'
+    +(s.qfMode==='timed'?'<div class="timer-ring'+(s.qfTimeLeft<=10?' timer-low':'')+'" id="qfTimer">'+s.qfTimeLeft+'s</div>':'')
+    +'<span style="color:var(--mu);font-size:13px">'+(s.qfMode==='timed'?s.qfScore+' pts':(s.qfCur+1)+' / '+qs.length)+'</span>'
+    +'</div></div>';
+
+  var prog = s.qfMode!=='timed'?'<div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%"></div></div>':'';
+
+  var tag = '<div class="theory-tag">'
+    +'<div style="width:6px;height:6px;border-radius:50%;background:'+q.co+'"></div>'
+    +'<span style="font-size:11px;font-weight:700;color:var(--em2);text-transform:uppercase;letter-spacing:1px">'+esc(q.theory)+'</span>'
+    +'</div>';
+
+  var question = '<div class="fadeUp" style="font-size:19px;font-weight:800;line-height:1.45;margin-bottom:20px">'+esc(q.prompt)+'</div>';
+
+  var fbStyle = s.qfFeedback==='correct'?'correct':s.qfFeedback==='wrong'?'wrong':'';
+  var inputBlock = '<input type="text" id="qfAnswer" class="qf-input'+' '+fbStyle+'" placeholder="Type your answer and press Enter..." oninput="qfInput()" onkeydown="qfKey(event)"'+(s.qfFeedback?'disabled':'')+'>';
+
+  var feedbackBlock = '';
+  if (s.qfFeedback === 'wrong') {
+    feedbackBlock = '<div class="fadeUp" style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:11px 14px;margin-top:10px">'
+      +'<div style="color:#f87171;font-weight:700;font-size:13px;margin-bottom:3px">Correct answer:</div>'
+      +'<div style="color:#fff;font-size:14px;font-weight:700;margin-bottom:6px">'+esc(q.answer)+'</div>'
+      +(q.hint?'<div style="color:var(--mu);font-size:12px">💡 '+esc(q.hint)+'</div>':'')
+      +'</div>';
+  }
+  if (s.qfFeedback === 'correct') {
+    feedbackBlock = '<div class="fadeUp" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:11px 14px;margin-top:10px;font-weight:700;color:var(--em2)">✓ Correct!</div>';
+  }
+
+  var hint = (!s.qfFeedback && q.hint) ? '<div style="color:var(--fa);font-size:12px;margin-top:10px">💡 Hint: '+esc(q.hint)+'</div>' : '';
+
+  var actionBtns = !s.qfFeedback ? '<div style="display:flex;gap:8px;margin-top:14px">'
+    +'<button class="btn btn-primary" style="flex:1;animation:none" onclick="submitQF()">Submit</button>'
+    +'<button class="btn btn-ghost" onclick="skipQF()">Skip →</button>'
+    +'</div>' : '';
+
+  var dotsH = '';
+  if (s.qfMode !== 'timed') {
+    dotsH = '<div class="dots">';
+    for (var i=0;i<s.qfCur;i++) { dotsH += '<div class="dot" style="background:'+(s.qfHistory[i]&&s.qfHistory[i].correct?'var(--em)':'var(--rd)')+'"></div>'; }
+    dotsH += '</div>';
+  }
+
+  return '<div class="page">'+topRow+prog+tag+question+inputBlock+feedbackBlock+hint+actionBtns+dotsH+'</div>';
+}
+
+function renderQFResults() {
+  var s = state;
+  var total = s.qfMode==='timed' ? Math.max(s.qfHistory.length,1) : s.qfQs.length;
+  var pct = Math.round((s.qfScore/total)*100);
+  var wrong = s.qfHistory.filter(function(h){return !h.correct;});
+
+  var emoji = pct>=80?'🎉':pct>=60?'👍':'📚';
+  var grade = pct>=80?'Excellent!':pct>=60?'Good work':s.qfMode==='timed'?'Keep sprinting!':'Keep revising';
+  var gradeColor = pct>=80?'var(--em)':pct>=60?'var(--pu2)':'var(--am)';
+
+  var h='<div class="page" style="text-align:center;padding-top:30px">'
+    +'<div style="font-size:52px;margin-bottom:12px">'+emoji+'</div>'
+    +'<div style="font-size:42px;font-weight:900;background:linear-gradient(135deg,var(--em2),var(--pu2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">'+
+    (s.qfMode==='timed'?s.qfScore:s.qfScore+'/'+s.qfQs.length)+'</div>'
+    +'<div style="color:var(--mu);font-size:14px;margin-top:4px">'+(s.qfMode==='timed'?'correct in 60 seconds':pct+'% correct')+'</div>'
+    +'<div style="font-size:18px;font-weight:800;color:'+gradeColor+';margin-top:8px;margin-bottom:24px">'+grade+'</div>';
+
+  if (wrong.length>0) {
+    h+='<div class="card" style="text-align:left">'
+      +'<div style="font-size:10px;color:var(--fa);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;font-weight:600">Review — Questions Missed</div>';
+    wrong.forEach(function(wr,i) {
+      h+='<div style="margin-bottom:12px;padding-bottom:12px;border-bottom:'+(i<wrong.length-1?'1px solid var(--bdr)':'none')+'">'
+        +'<div style="font-size:13px;font-weight:600;margin-bottom:4px">'+esc(wr.q.prompt)+'</div>'
+        +'<div style="font-size:12px;color:#f87171;margin-bottom:2px">You: '+esc(wr.given)+'</div>'
+        +'<div style="font-size:12px;color:var(--em2)">Correct: '+esc(wr.q.answer)+'</div>'
+        +(wr.q.hint?'<div style="font-size:11px;color:var(--fa);margin-top:3px">💡 '+esc(wr.q.hint)+'</div>':'')
+        +'</div>';
+    });
+    h+='</div>';
+  }
+
+  h+='<div style="display:flex;gap:8px;margin-top:16px">'
+    +'<button class="btn btn-ghost" style="flex:1;padding:13px" onclick="state.qfMode=\'config\';render()">Try Again</button>'
+    +'<button class="btn btn-primary" style="flex:1.5;padding:13px;animation:none" onclick="state.qfMode=\'home\';render()">Home</button>'
+    +'</div></div>';
+  return h;
+}
+
+function startQFConfig(mode) {
+  state.qfMode = mode;
+  state.qfTopics = state.theories.map(function(t){return t.id;});
+  render();
+}
+function qfSelectAll() { state.qfTopics=state.theories.map(function(t){return t.id;}); render(); }
+function qfSelectNone() { state.qfTopics=[]; render(); }
+function qfToggleTopic(id) {
+  var i=state.qfTopics.indexOf(id);
+  if(i>=0)state.qfTopics.splice(i,1);else state.qfTopics.push(id);
+  render();
+}
+
+function launchQF() {
+  var pool=[];
+  state.theories.forEach(function(t) {
+    if(state.qfTopics.indexOf(t.id)<0)return;
+    var qfs=t.qf||[];
+    var filtered=state.qfMode==='match'?qfs.filter(function(q){return q.type==='match';}):
+      state.qfMode==='fill'?qfs.filter(function(q){return q.type==='fill';}):
+      state.qfMode==='acronym'?qfs.filter(function(q){return q.type==='acronym';}):qfs;
+    filtered.forEach(function(q){pool.push(Object.assign({},q,{theory:t.ti,co:t.co}));});
+  });
+  if(!pool.length){alert('No quick-fire questions available for the selected topics and mode.');return;}
+  var qs=shuf(pool).slice(0,state.qfMode==='timed'?60:20);
+  state.qfQs=qs;state.qfCur=0;state.qfScore=0;state.qfHistory=[];state.qfFeedback=null;
+  state.qfMode='playing';
+  if(state.qfTimerActive){clearInterval(qfTimerInterval);state.qfTimerActive=false;}
+  render();
+  if(state.qfMode==='playing'){setTimeout(function(){var el=document.getElementById('qfAnswer');if(el)el.focus();},100);}
+  if(state.qfQs.length>0&&qs!==[]&&state.qfMode==='playing'&&state.qfQs[0]&&state.qfQs[0].type){
+    // start timer if timed
+    startQFTimer();
+  }
+}
+
+function startQFTimer() {
+  if(state.qfMode!=='playing'){return;}
+  // Check if the original selected mode was timed
+  var wasTimed=(state.qfQs.length>0&&state.qfQs.length===60)||state.qfTimeLeft<60;
+  // We'll handle timer differently — check via a data attribute
+  var timerEl=document.getElementById('qfTimer');
+  if(!timerEl)return;
+  state.qfTimeLeft=60;state.qfTimerActive=true;
+  clearInterval(qfTimerInterval);
+  qfTimerInterval=setInterval(function(){
+    state.qfTimeLeft--;
+    var el=document.getElementById('qfTimer');
+    if(el)el.textContent=state.qfTimeLeft+'s';
+    if(state.qfTimeLeft<=10&&el)el.classList.add('timer-low');
+    if(state.qfTimeLeft<=0){clearInterval(qfTimerInterval);state.qfTimerActive=false;state.qfMode='results';render();}
+  },1000);
+}
+
+function qfInput(){}
+function qfKey(e){if(e.key==='Enter')submitQF();}
+function submitQF(){
+  var el=document.getElementById('qfAnswer');if(!el)return;
+  var val=el.value.trim();if(!val)return;
+  var q=state.qfQs[state.qfCur];
+  var correct=val.toLowerCase()===q.answer.toLowerCase();
+  state.qfFeedback=correct?'correct':'wrong';
+  state.qfHistory.push({q:q,given:val,correct:correct});
+  if(correct)state.qfScore++;
+  el.value='';
+  // update input style without full render for speed
+  el.className='qf-input '+state.qfFeedback;
+  el.disabled=true;
+  // Render feedback inline
+  setTimeout(function(){
+    state.qfFeedback=null;
+    if(state.qfCur+1>=state.qfQs.length){
+      clearInterval(qfTimerInterval);state.qfTimerActive=false;state.qfMode='results';render();
+    }else{
+      state.qfCur++;
+      render();
+      setTimeout(function(){var i=document.getElementById('qfAnswer');if(i)i.focus();},80);
+    }
+  },correct?650:1300);
+}
+function skipQF(){
+  state.qfHistory.push({q:state.qfQs[state.qfCur],given:'(skipped)',correct:false});
+  state.qfFeedback=null;
+  if(state.qfCur+1>=state.qfQs.length){clearInterval(qfTimerInterval);state.qfTimerActive=false;state.qfMode='results';render();}
+  else{state.qfCur++;render();setTimeout(function(){var i=document.getElementById('qfAnswer');if(i)i.focus();},80);}
+}
+function exitQF(){clearInterval(qfTimerInterval);state.qfTimerActive=false;state.qfMode='home';render();}
+
+// ══ QUIZ ═══════════════════════════════════════════════════════════════════════
+function renderQuiz() {
+  if(!state.quizMode)return renderQuizHome();
+  if(state.quizMode==='config')return renderQuizConfig();
+  if(state.quizMode==='playing')return renderQuizPlay();
+  if(state.quizMode==='results')return renderQuizResults();
+  return renderQuizHome();
+}
+
+function renderQuizHome(){
+  var modes=[
+    {id:'mc',icon:'🎯',label:'Multiple Choice',desc:'Randomised questions with instant correct/wrong feedback and study notes'},
+    {id:'essay',icon:'📝',label:'Essay Questions',desc:'Academic-style questions with model answers, improvement suggestions, and self-rating'},
+    {id:'mixed',icon:'⚡',label:'Mixed Mode',desc:'Both MC and essay questions combined — best for full exam prep'}
+  ];
+  var h='<div class="page"><h1 style="font-size:22px;font-weight:900;margin-bottom:4px">🧠 Quiz</h1>'
+    +'<p style="color:var(--mu);font-size:13px;margin-bottom:24px;line-height:1.6">Full exam-style questions. Randomised every session.</p>';
+  modes.forEach(function(m){
+    h+='<div class="card fadeUp" style="cursor:pointer;display:flex;align-items:center;gap:14px" onclick="startQuizConfig(\''+m.id+'\')">'
+      +'<div style="font-size:28px;width:44px;text-align:center">'+m.icon+'</div>'
+      +'<div><div style="font-weight:700;font-size:15px;margin-bottom:3px">'+m.label+'</div>'
+      +'<div style="color:var(--mu);font-size:12px">'+m.desc+'</div></div>'
+      +'<div style="margin-left:auto;color:var(--fa);font-size:18px">›</div></div>';
+  });
+  return h+'</div>';
+}
+
+function renderQuizConfig(){
+  var s=state;
+  var modeLabel={mc:'🎯 Multiple Choice',essay:'📝 Essay Questions',mixed:'⚡ Mixed Mode'}[s.quizMode]||'';
+  var h='<div class="page"><div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">'
+    +'<button class="btn btn-ghost" onclick="state.quizMode=null;render()">← Back</button>'
+    +'<div style="font-weight:800;font-size:16px">'+modeLabel+'</div></div>'
+    +'<div style="font-size:10px;color:var(--fa);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;font-weight:600">Choose Topics</div>'
+    +'<div style="display:flex;gap:8px;margin-bottom:12px">'
+    +'<button class="btn btn-em" onclick="quizSelectAll()">All</button>'
+    +'<button class="btn btn-ghost" onclick="quizSelectNone()">None</button></div>';
+  s.theories.forEach(function(t){
+    var sel=s.quizTopics.indexOf(t.id)>=0;
+    h+='<div class="card" style="cursor:pointer;display:flex;align-items:center;gap:10px;border-color:'+(sel?t.co+'55':'')+';" onclick="quizToggleTopic(\''+t.id+'\')">'
+      +'<div style="width:10px;height:10px;border-radius:50%;background:'+t.co+'"></div>'
+      +'<div style="flex:1"><div style="font-weight:700;font-size:13px">'+esc(t.ft)+'</div>'
+      +'<div style="font-size:11px;color:var(--fa)">'+(t.qz?t.qz.length:0)+' MC · '+(t.wq?t.wq.length:0)+' essay</div></div>'
+      +'<div style="width:22px;height:22px;border-radius:6px;background:'+(sel?t.co:'var(--bdr)')+';display:flex;align-items:center;justify-content:center;font-size:12px;color:'+(sel?'#000':'transparent')+'">✓</div></div>';
+  });
+  h+='<button class="btn btn-primary btn-full" style="margin-top:12px" onclick="launchQuiz()" '+(s.quizTopics.length?'':'disabled')+'>Start Quiz →</button>';
+  return h+'</div>';
+}
+
+function renderQuizPlay(){
+  var s=state;
+  var qs=s.quizQs;
+  if(!qs.length||s.quizCur>=qs.length){s.quizMode='results';return renderQuizResults();}
+  var q=qs[s.quizCur];
+  var pct=Math.round((s.quizCur/qs.length)*100);
+
+  var topRow='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    +'<button class="btn btn-ghost" onclick="state.quizMode=null;render()">✕ Exit</button>'
+    +'<span style="color:var(--mu);font-size:13px">'+(s.quizCur+1)+' / '+qs.length+'</span></div>';
+
+  var tag='<div class="theory-tag">'
+    +'<div style="width:6px;height:6px;border-radius:50%;background:'+q.co+'"></div>'
+    +'<span style="font-size:11px;font-weight:700;color:var(--em2);text-transform:uppercase;letter-spacing:1px">'+esc(q.theory)+'</span></div>';
+
+  var qText='<div class="fadeUp" style="font-size:18px;font-weight:700;line-height:1.45;margin-bottom:20px">'+esc(q.q)+'</div>';
+
+  var body='';
+  if(q.type==='mc'){
+    q.opts.forEach(function(opt,i){
+      var answered=s.quizChosen!==null;
+      var isCorrect=opt===q.correctText;
+      var isChosen=opt===s.quizChosen;
+      var cls='q-opt'+(answered?isCorrect?' correct':isChosen?' wrong':' dim':'');
+      var badgeTxt=answered?(isCorrect?'✓':isChosen?'✗':String.fromCharCode(65+i)):String.fromCharCode(65+i);
+      body+='<button class="'+cls+'" style="animation-delay:'+(i*0.07)+'s" onclick="answerMC(\''+esc(opt)+'\')">'
+        +'<div class="q-badge">'+badgeTxt+'</div>'
+        +'<div style="font-size:14px;color:'+(answered?isCorrect?'var(--em2)':isChosen?'#fca5a5':'var(--mu)':'#d0e4f4')+';font-weight:'+(answered&&isCorrect?600:400)+'">'+esc(opt)+'</div>'
+        +'</button>';
+    });
+    if(s.quizChosen){
+      var ok=s.quizChosen===q.correctText;
+      body+='<div class="fb-box fadeUp '+(ok?'fb-good':'fb-bad')+'">'
+        +'<div style="font-weight:700;font-size:14px;margin-bottom:4px;color:'+(ok?'var(--em2)':'#f87171')+'">'+(ok?'✓ Correct!':'✗ Not quite')+'</div>'
+        +(ok?'<div style="color:var(--mu);font-size:13px">Well done!</div>':'<div style="color:var(--mu);font-size:13px">Correct: <strong style="color:#fff">'+esc(q.correctText)+'</strong></div>')
+        +(q.im?'<div class="study-note"><div style="font-size:10px;color:var(--am);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">📚 Study note</div><div style="font-size:12px;color:#c8d8e8;line-height:1.6">'+esc(q.im)+'</div></div>':'')
+        +'</div>'
+        +'<button class="btn btn-primary btn-full" style="margin-top:12px;animation:none" onclick="nextQuizQ()">'+(s.quizCur+1>=qs.length?'See Results':'Next →')+'</button>';
+    }
+  } else if(q.type==='essay'){
+    body='<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--mu);line-height:1.6;margin-bottom:12px">'+esc(q.pr)+'</div>'
+      +'<textarea class="inp inp-lg" id="wAnswerTA" placeholder="Write your answer here..." rows="6" oninput="wAnswerChange()">'+esc(s.wAnswer||'')+'</textarea>'
+      +'<div style="font-size:11px;color:var(--fa);text-align:right;margin-top:6px;margin-bottom:12px" id="wWordCount">'+((s.wAnswer||'').trim()?((s.wAnswer||'').trim().split(/\s+/).length)+' words':'0 words')+'</div>'
+      +'<button class="btn btn-em btn-full" style="margin-bottom:10px" onclick="showModelAnswer()">Reveal Model Answer ↓</button>';
+    if(s.showModel){
+      body+='<div class="fadeUp" style="background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.25);border-radius:12px;padding:14px;margin-bottom:10px">'
+        +'<div style="font-size:10px;color:var(--em2);font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">✦ Model Answer</div>'
+        +'<div style="font-size:13px;color:#c8d8e8;line-height:1.7">'+esc(q.mo)+'</div></div>';
+      if(q.im&&q.im.length){
+        var impH='<div class="fadeUp" style="background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:14px;margin-bottom:12px">'
+          +'<div style="font-size:10px;color:var(--am);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">⚠ Areas to Strengthen</div>';
+        q.im.forEach(function(pt,i){
+          impH+='<div style="display:flex;gap:8px;margin-bottom:8px;font-size:12px;color:#c8d8e8;line-height:1.6">'
+            +'<div style="width:18px;height:18px;border-radius:50%;background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;color:var(--am);font-weight:700;margin-top:1px">'+(i+1)+'</div>'
+            +'<div>'+esc(pt)+'</div></div>';
+        });
+        body+=impH+'<div style="font-size:12px;color:var(--mu);margin-top:12px;margin-bottom:8px">How well did your answer cover the key points?</div>'
+          +'<div style="display:flex;gap:8px">'
+          +'<button class="sr-btn'+(s.selfRating==='g'?' gs':'')+'" onclick="rateSelf(\'g\')">✓ Strong</button>'
+          +'<button class="sr-btn'+(s.selfRating==='o'?' os':'')+'" onclick="rateSelf(\'o\')">~ Partial</button>'
+          +'<button class="sr-btn'+(s.selfRating==='b'?' bs':'')+'" onclick="rateSelf(\'b\')">✗ Missed</button>'
+          +'</div></div>';
+      }
+      if(s.selfRating){
+        body+='<button class="btn btn-primary btn-full" style="animation:none" onclick="nextQuizQ()">'+(s.quizCur+1>=qs.length?'See Results':'Next →')+'</button>';
+      }
+    }
+  }
+
+  return '<div class="page">'+topRow+'<div class="prog-bar"><div class="prog-fill" style="width:'+pct+'%"></div></div>'+tag+qText+body+'</div>';
+}
+
+function renderQuizResults(){
+  var s=state;
+  var mcA=s.quizAnswers.filter(function(a){return a.type==='mc';});
+  var essayA=s.quizAnswers.filter(function(a){return a.type==='essay';});
+  var pct=mcA.length?Math.round((mcA.filter(function(a){return a.ok;}).length/mcA.length)*100):0;
+  var circ=390,off=circ-(pct/100)*circ;
+  var grade=pct>=80?{l:'Excellent!',c:'var(--em)'}:pct>=60?{l:'Good work',c:'var(--pu2)'}:mcA.length===0?{l:'Written complete',c:'var(--em)'}:{l:'Keep revising',c:'var(--am)'};
+
+  var thMap={};
+  s.quizAnswers.forEach(function(a){
+    if(!thMap[a.theory])thMap[a.theory]={mc:0,mcT:0,wG:0,wO:0,wB:0};
+    if(a.type==='mc'){thMap[a.theory].mcT++;if(a.ok)thMap[a.theory].mc++;}
+    else{if(a.r==='g')thMap[a.theory].wG++;else if(a.r==='o')thMap[a.theory].wO++;else thMap[a.theory].wB++;}
+  });
+  var bk='';
+  Object.keys(thMap).forEach(function(th){
+    var td=thMap[th];
+    var dc=td.mcT>0?(td.mc/td.mcT<0.6?'var(--rd)':td.mc<td.mcT?'var(--am)':'var(--em)'):(td.wB>0?'var(--rd)':'var(--em)');
+    bk+='<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;font-size:13px">'
+      +'<div style="width:8px;height:8px;border-radius:50%;background:'+dc+';flex-shrink:0;margin-top:4px"></div>'
+      +'<div><strong>'+esc(th)+'</strong>'
+      +(td.mcT>0?'<span style="color:var(--em2)"> — MC: '+td.mc+'/'+td.mcT+'</span>':'')
+      +(td.wG>0?'<span style="color:var(--em2)"> — Written: Strong</span>':'')
+      +(td.wO>0?'<span style="color:var(--am)"> — Written: Partial</span>':'')
+      +(td.wB>0?'<span style="color:#f87171"> — Written: Needs work</span>':'')
+      +'</div></div>';
+  });
+
+  return '<div class="page" style="text-align:center;padding-top:10px">'
+    +'<div class="score-ring-wrap">'
+    +'<svg width="148" height="148" viewBox="0 0 148 148">'
+    +'<defs><linearGradient id="rG" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>'
+    +'<circle cx="74" cy="74" r="62" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="13"/>'
+    +'<circle cx="74" cy="74" r="62" fill="none" stroke="url(#rG)" stroke-width="13" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 74 74)" style="transition:stroke-dashoffset 1.2s ease"/>'
+    +'</svg>'
+    +'<div class="score-ring-inner"><div style="font-size:36px;font-weight:900;background:linear-gradient(135deg,var(--em2),var(--pu2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">'+(mcA.length>0?pct+'%':'✓')+'</div>'
+    +'<div style="font-size:11px;color:var(--mu)">'+(mcA.length>0?'MC score':'complete')+'</div></div></div>'
+    +'<div style="font-size:22px;font-weight:800;color:'+grade.c+';margin-bottom:6px">'+grade.l+'</div>'
+    +(mcA.length>0?'<div style="color:var(--mu);font-size:14px;margin-bottom:12px">'+mcA.filter(function(a){return a.ok;}).length+' of '+mcA.length+' multiple choice correct</div>':'')
+    +(essayA.length>0?'<div style="color:var(--mu);font-size:13px;margin-bottom:12px">Written: '+essayA.filter(function(a){return a.r==='g';}).length+' strong · '+essayA.filter(function(a){return a.r==='o';}).length+' partial · '+essayA.filter(function(a){return a.r==='b';}).length+' needs work</div>':'')
+    +'<div class="card" style="text-align:left">'
+    +'<div style="font-size:10px;color:var(--fa);text-transform:uppercase;letter-spacing:2px;margin-bottom:12px;font-weight:600">Breakdown by Theory</div>'
+    +bk+'</div>'
+    +'<div style="display:flex;gap:8px;margin-top:16px">'
+    +'<button class="btn btn-ghost" style="flex:1;padding:13px" onclick="state.quizMode=\'config\';render()">Try Again</button>'
+    +'<button class="btn btn-primary" style="flex:1.5;padding:13px;animation:none" onclick="state.quizMode=null;render()">Home</button>'
+    +'</div></div>'
+    +(pct>=80&&mcA.length>0?'<script>spawnConfetti();<\/script>':'');
+}
+
+function startQuizConfig(m){state.quizMode='config';state.quizTopics=state.theories.map(function(t){return t.id;});state.quizAnswers=[];state.quizMode=m;render();state.quizMode='config';}
+function startQuizConfig(m){state.quizMode='config';state.quizTopics=state.theories.map(function(t){return t.id;});render();}
+// oops, let's do it right:
+function startQuizConfig(m){
+  state.quizMode='config';
+  state._pendingMode=m;
+  state.quizTopics=state.theories.map(function(t){return t.id;});
+  render();
+}
+function quizSelectAll(){state.quizTopics=state.theories.map(function(t){return t.id;});render();}
+function quizSelectNone(){state.quizTopics=[];render();}
+function quizToggleTopic(id){var i=state.quizTopics.indexOf(id);if(i>=0)state.quizTopics.splice(i,1);else state.quizTopics.push(id);render();}
+
+function launchQuiz(){
+  var mode=state._pendingMode||'mc';
+  var pool=[];
+  state.theories.forEach(function(t){
+    if(state.quizTopics.indexOf(t.id)<0)return;
+    if(mode==='mc'||mode==='mixed'){
+      shuf(t.qz||[]).slice(0,3).forEach(function(q){
+        var opts=shuf(q.o.slice());
+        pool.push({type:'mc',q:q.q,opts:opts,correctText:q.o[q.a],im:q.im,theory:t.ti,co:t.co});
+      });
+    }
+    if(mode==='essay'||mode==='mixed'){
+      shuf(t.wq||[]).slice(0,1).forEach(function(w){
+        pool.push({type:'essay',q:w.q,pr:w.pr,mo:w.mo,im:w.im,theory:t.ti,co:t.co});
+      });
+    }
+  });
+  if(!pool.length){alert('No questions available for selected topics.');return;}
+  state.quizQs=shuf(pool).slice(0,15);
+  state.quizCur=0;state.quizAnswers=[];state.quizChosen=null;
+  state.wAnswer='';state.showModel=false;state.selfRating=null;
+  state.quizMode='playing';render();
+}
+
+function answerMC(opt){
+  if(state.quizChosen)return;
+  state.quizChosen=opt;
+  var q=state.quizQs[state.quizCur];
+  state.quizAnswers.push({type:'mc',ok:opt===q.correctText,theory:q.theory});
+  render();
+}
+function nextQuizQ(){
+  state.quizCur++;state.quizChosen=null;state.wAnswer='';state.showModel=false;state.selfRating=null;
+  if(state.quizCur>=state.quizQs.length){state.quizMode='results';}
+  render();
+}
+function wAnswerChange(){var ta=document.getElementById('wAnswerTA');if(ta)state.wAnswer=ta.value;}
+function showModelAnswer(){state.showModel=true;render();setTimeout(function(){var ma=document.getElementById('wAnswerTA');if(ma)ma.scrollIntoView({behavior:'smooth',block:'nearest'});},100);}
+function rateSelf(r){
+  state.selfRating=r;
+  var q=state.quizQs[state.quizCur];
+  state.quizAnswers.push({type:'essay',r:r,theory:q.theory});
+  render();
+}
+
+// ══ AI TUTOR ═══════════════════════════════════════════════════════════════════
+function renderTutor(){
+  var s=state;
+  var topbar='<div class="topbar"><div class="topbar-inner" style="padding-bottom:12px">'
+    +'<div style="font-size:10px;color:var(--mu);letter-spacing:2px;text-transform:uppercase">AI Tutor</div>'
+    +'<div style="font-size:17px;font-weight:800">💬 Change Management Tutor</div>'
+    +'</div></div>';
+
+  var msgs='';
+  s.chatMessages.forEach(function(m){
+    if(m.role==='user'){
+      msgs+='<div class="chat-msg user"><div class="bubble user">'+esc(m.content).replace(/\n/g,'<br>')+'<div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:6px;text-align:right">'+esc(m.time||'')+'</div></div></div>';
+    } else {
+      msgs+='<div class="chat-msg"><div class="ai-avatar">✦</div>'
+        +'<div class="bubble ai">'+renderAIText(m.content)+'<div style="font-size:10px;color:var(--fa);margin-top:6px;text-align:right">'+esc(m.time||'')+'</div></div></div>';
+    }
+  });
+  if(s.chatLoading){
+    msgs+='<div class="chat-msg"><div class="ai-avatar">✦</div>'
+      +'<div class="bubble ai" style="padding:12px 16px"><div style="display:flex;gap:5px;align-items:center">'
+      +'<div class="typing-dot" style="animation-delay:0s"></div>'
+      +'<div class="typing-dot" style="animation-delay:0.2s"></div>'
+      +'<div class="typing-dot" style="animation-delay:0.4s"></div>'
+      +'</div></div></div>';
+  }
+  msgs+='<div id="chatBottom"></div>';
+
+  var quickPrompts=['Explain ADKAR simply','Quiz me on Kotter','Lewin vs ADKAR?','BCG vs Ansoff?','Digital transformation exam tips','Quiz me on all theories'];
+  var qp='<div style="display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;padding-bottom:4px;scrollbar-width:none">';
+  quickPrompts.forEach(function(q){
+    qp+='<button style="flex-shrink:0;padding:6px 12px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:20px;color:var(--em2);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap" onclick="sendQuickMsg(\''+q.replace(/'/g,"\\'")+'\')">' +q+'</button>';
+  });
+  qp+='</div>';
+
+  var inputArea='<div style="position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(7,9,15,0.97);border-top:1px solid var(--bdr);padding:10px 16px max(10px,env(safe-area-inset-bottom));backdrop-filter:blur(16px)">'
+    +(s.chatMessages.length<=2?qp:'')
+    +'<div style="display:flex;gap:8px">'
+    +'<input type="text" id="chatInput" class="inp" placeholder="Ask anything, or say \'quiz me\'..." style="flex:1" onkeydown="chatKey(event)"'+(s.chatLoading?' disabled':'')+'>'
+    +'<button class="btn btn-primary" style="padding:12px 18px;flex-shrink:0;animation:none" onclick="sendChat()"'+(s.chatLoading?' disabled':'')+'>→</button>'
+    +'</div><div style="height:60px"></div></div>';
+
+  return topbar+'<div style="overflow-y:auto;padding:76px 16px 200px;max-width:680px;margin:0 auto">'+msgs+'</div>'+inputArea;
+}
+
+function renderAIText(text){
+  return esc(text)
+    .replace(/\n\n/g,'<br><br>')
+    .replace(/\n/g,'<br>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/•\s/g,'<span style="color:var(--em)">·</span> ')
+    .replace(/^\d\.\s/gm,'<span style="color:var(--em)">→</span> ');
+}
+
+function chatKey(e){if(e.key==='Enter'&&!e.shiftKey)sendChat();}
+function sendQuickMsg(msg){var el=document.getElementById('chatInput');if(el){el.value=msg;}sendChat();}
+
+function sendChat(){
+  var el=document.getElementById('chatInput');
+  var msg=el?el.value.trim():'';
+  if(!msg||state.chatLoading)return;
+  state.chatMessages.push({role:'user',content:msg,time:now()});
+  state.chatLoading=true;
+  render();
+
+  var ctx=state.theories.map(function(t){return t.ft+': '+t.ov+' Key insight: '+t.ki;}).join('\n\n');
+  var sys='You are an expert academic tutor for a postgraduate Change Management module (7WBS2034-0507-2025). The student is studying:\n\n'+ctx+'\n\nYour role:\n1. EXPLAIN theories in clear, accessible language\n2. QUIZ the student conversationally — one question at a time, give feedback, then continue\n3. ANSWER questions accurately\n4. Connect frameworks together\n5. Give exam tips\n\nKeep responses concise and mobile-friendly. Use bullet points sparingly. Be encouraging. Reference academic sources (Kotter 1996, Prosci, WEF 2025, Brynjolfsson & McAfee 2014, Gartner, McKinsey) where relevant. If quizzing, ask ONE question at a time and wait for their response before revealing the answer.';
+
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',max_tokens:600,
+      system:sys,
+      messages:state.chatMessages.filter(function(m){return m.role==='user'||m.role==='assistant';}).map(function(m){return{role:m.role,content:m.content};})
+    })
+  }).then(function(r){return r.json();}).then(function(data){
+    state.chatLoading=false;
+    var text=data.content?data.content.filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join(''):'Sorry, I could not generate a response. Please try again.';
+    if(data.error)text='API error: '+(data.error.message||'Unknown error');
+    state.chatMessages.push({role:'assistant',content:text,time:now()});
+    // Save chat history (last 30 messages)
+    lsSet('cm_chat_history',state.chatMessages.slice(-30));
+    render();
+    setTimeout(function(){var b=document.getElementById('chatBottom');if(b)b.scrollIntoView({behavior:'smooth'});},100);
+  }).catch(function(err){
+    state.chatLoading=false;
+    state.chatMessages.push({role:'assistant',content:'Network error — please check your connection and try again.',time:now()});
+    render();
+  });
+}
+
+// ══ CONFETTI ═══════════════════════════════════════════════════════════════════
+function spawnConfetti(){
+  var colors=['#10b981','#34d399','#8b5cf6','#a78bfa','#6ee7b7','#c4b5fd','#fbbf24'];
+  for(var i=0;i<26;i++){
+    var el=document.createElement('div');
+    el.className='cfp';
+    el.style.left=Math.random()*100+'%';
+    el.style.top=Math.random()*30+'%';
+    el.style.background=colors[Math.floor(Math.random()*colors.length)];
+    el.style.width=(6+Math.floor(Math.random()*7))+'px';
+    el.style.height=(6+Math.floor(Math.random()*7))+'px';
+    el.style.borderRadius=Math.random()>0.5?'50%':'2px';
+    el.style.animationDelay=Math.random()*0.9+'s';
+    el.style.animationDuration=(1.4+Math.random()*0.8)+'s';
+    document.body.appendChild(el);
+    setTimeout(function(e){return function(){if(e.parentNode)e.parentNode.removeChild(e);};}(el),2800);
+  }
+}
+
+// ── EVENT BINDING ─────────────────────────────────────────────────────────────
+function bindEvents(){
+  // QF timer — check if we need to start it
+  if(state.tab==='quickfire'&&state.qfMode==='playing'){
+    var timerEl=document.getElementById('qfTimer');
+    if(timerEl&&!state.qfTimerActive){
+      startQFTimer();
+    }
+  }
+  // Focus QF input
+  if(state.tab==='quickfire'&&state.qfMode==='playing'&&!state.qfFeedback){
+    var inp=document.getElementById('qfAnswer');if(inp&&!document.activeElement.matches('input'))inp.focus();
+  }
+}
+
+// ── START ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',init);
+
+</script>
+</body>
+</html>
